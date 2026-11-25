@@ -1,0 +1,8 @@
+SEQUÊNCIA PNG — PORTFOLIO
+
+220 frames, numerados de frame_0001.png a frame_0220.png.
+Resolução: 1100 × 1250 px. Fundo transparente (RGBA).
+Reprodução: 20 frames por segundo. Duração: 11 segundos.
+A sequência inclui os frames repetidos das pausas, para preservar o tempo original.
+Importar como sequência PNG a 20 fps e configurar repetição para reproduzir o loop.
+Exportação das imagens originais da versão v5 aprovada, antes da compressão GIF/WebP.

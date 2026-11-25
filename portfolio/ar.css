@@ -1,0 +1,129 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    font-family: Georgia, serif;
+    background: transparent !important;
+}
+
+body {
+    position: relative;
+    isolation: isolate;
+}
+
+/* CÂMARA */
+
+body > video {
+    position: absolute;
+    z-index: 0 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: none;
+}
+
+/* REALIDADE AUMENTADA */
+
+a-scene {
+    position: absolute !important;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent !important;
+    z-index: 1 !important;
+}
+
+a-scene canvas {
+    background: transparent !important;
+}
+
+/* INTERFACE */
+
+#interface-ar {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    background: transparent;
+}
+
+/* BOTÃO VOLTAR */
+
+.voltar {
+    position: absolute;
+    top: 22px;
+    left: 22px;
+    padding: 12px 18px;
+    background: #510c19;
+    color: #e8d3a3;
+    border: 1px solid #c2a36b;
+    border-radius: 5px;
+    font-size: 14px;
+    text-decoration: none;
+    pointer-events: auto;
+}
+
+/* INSTRUÇÕES */
+
+.instrucoes {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 450px;
+    padding: 22px;
+    background: rgba(52, 7, 16, 0.85);
+    border: 1px solid #c2a36b;
+    border-radius: 8px;
+    text-align: center;
+    color: #ead9b5;
+}
+
+.instrucoes h1 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    font-weight: normal;
+}
+
+.instrucoes p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* MOLDURA DE RECONHECIMENTO */
+
+.moldura-ar {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 480px;
+    aspect-ratio: 850 / 437;
+    border: 2px dashed rgba(232, 211, 163, 0.7);
+    border-radius: 8px;
+    transition: opacity 0.3s ease;
+}
+
+body.alvo-encontrado .moldura-ar {
+    opacity: 0;
+}
+
+/* OCULTAR BOTÃO DE ECRÃ INTEIRO */
+
+.a-enter-vr,
+.a-enter-ar,
+.a-enter-vr-button,
+.a-enter-ar-button {
+    display: none !important;
+}

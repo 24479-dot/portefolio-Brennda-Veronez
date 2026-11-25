@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Portfólio de Brennda Veronez — design, ilustração e multimédia."
+    >
+    <title>Brennda Veronez | Portfólio</title>
+    <link rel="preload" href="fontes/chomsky.otf" as="font" type="font/otf" crossorigin="">
+    <link
+      rel="preload"
+      href="fontes/maquina-elegante-regular.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin=""
+    >
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer="defer"></script>
+  </head>
+  <body>
+    <a class="saltar-menu" href="#inicio">Saltar para o conteúdo</a>
+    <!--
+      ==================================================================
+      MENU FIXO
+      Os links saltam para os identificadores das secções.
+      ==================================================================
+    -->
+    <header class="menu-fixo">
+      <nav aria-label="Navegação principal">
+        <a href="#inicio" aria-label="Início">BV</a>
+        <a href="#carta">Carta</a>
+        <a href="#sobre-mim">Sobre mim</a>
+        <a href="#escolaridade">Escolaridade</a>
+        <a href="#habilidades">Habilidades</a>
+        <a href="#trabalhos">Trabalhos</a>
+      </nav>
+    </header>
+    <!--
+      ==================================================================
+      CONTEÚDO DO PORTFÓLIO
+      As secções abaixo seguem a ordem da página.
+      ==================================================================
+    -->
+    <main>
+      <!--
+        ==================================================================
+        SECÇÃO 01 · CAPA
+        Nome, contacto e título do portfólio.
+        ==================================================================
+      -->
+      <section class="secao-portfolio secao-capa" id="inicio" aria-labelledby="titulo-inicio">
+        <img class="camada-fundo" src="imagens/fundo-capa.png" alt="">
+        <div class="caixa-visual caderno-capa">
+          <img class="imagem-caixa" src="imagens/caderno-capa.png" alt="">
+          <div class="conteudo-caixa conteudo-capa">
+            <div class="cabecalho-livro">
+              <p class="nome-autora">
+                Brennda Veronez<br>
+                (Design Gráfico / 3D Artist)
+              </p>
+              <p class="contato-capa">
+                Contact<br>
+                27200@uportalegre.pt
+              </p>
+            </div>
+            <h1 id="titulo-inicio">
+              <span class="texto-acessivel">Portfólio</span>
+              <img src="imagens/titulo-portfolio.png" alt="">
+            </h1>
+            <div class="base-livro">
+              <p class="producao-capa">Produção Multimédia 2026</p>
+              <p class="rodape-livro">
+                DMA – Universidade Politécnica<br>
+                de Portalegre
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Fim da secção 01 · CAPA -->
+      <!--
+        ==================================================================
+        SECÇÃO 02 · CARTA
+        Envelope e selo decorativos.
+        ==================================================================
+      -->
+      <section class="secao-portfolio secao-carta" id="carta" aria-labelledby="titulo-carta">
+        <img class="camada-fundo" src="imagens/fundo-carta.png" alt="" loading="lazy">
+        <div class="composicao-carta">
+          <img
+            class="imagem-sobreposta envelope"
+            src="imagens/envelope.png"
+            alt="Envelope de papel borgonha com renda"
+            loading="lazy"
+          >
+          <h2 class="texto-acessivel" id="titulo-carta">Carta</h2>
+          <img
+            class="imagem-sobreposta selo-carta"
+            id="selo-carta"
+            src="imagens/selo-carta.png"
+            alt="Selo dourado da carta"
+            loading="lazy"
+          >
+        </div>
+      </section>
+      <!-- Fim da secção 02 · CARTA -->
+      <!--
+        ==================================================================
+        SECÇÃO 03 · SOBRE MIM
+        Retrato e texto de apresentação.
+        ==================================================================
+      -->
+      <section
+        class="secao-portfolio secao-sobre-mim"
+        id="sobre-mim"
+        aria-labelledby="titulo-sobre"
+      >
+        <img class="camada-fundo" src="imagens/fundo-sobre-mim.png" alt="" loading="lazy">
+        <img
+          class="imagem-sobreposta retrato"
+          src="imagens/foto-brennda.png"
+          alt="Retrato de Brennda numa moldura de fotografia instantânea"
+          loading="lazy"
+        >
+        <article class="caixa-visual quadro-apresentacao">
+          <img class="imagem-caixa" src="imagens/cartao-sobre-mim.png" alt="" loading="lazy">
+          <div class="conteudo-caixa biografia">
+            <h2 class="texto-acessivel" id="titulo-sobre">Sobre mim</h2>
+            <p>
+              Brennda Veronez, 23 anos, brasileira, residente em Portugal.<br>
+              Sou formada em Administração e formanda em Design Multimédia e Audiovisuais.
+            </p>
+            <p>
+              Sou uma pessoa criativa, curiosa e interessada em explorar diferentes formas de
+              comunicação visual.<br>
+              Tenho especial interesse pela ilustração e pela criação de conteúdos 3D.<br>
+              Através dos meus projetos, pretendo desenvolver as minhas competências,
+              experimentar novas técnicas e encontrar soluções visuais originais que reflitam a
+              minha identidade enquanto designer.
+            </p>
+          </div>
+        </article>
+      </section>
+      <!-- Fim da secção 03 · SOBRE MIM -->
+      <!--
+        ==================================================================
+        SECÇÃO 04 · ESCOLARIDADE
+        Quatro cartões com cursos e datas.
+        ==================================================================
+      -->
+      <section
+        class="secao-portfolio secao-escolaridade"
+        id="escolaridade"
+        aria-labelledby="titulo-escolaridade"
+      >
+        <img
+          class="camada-fundo fundo-formacao-continuo"
+          src="imagens/fundo-formacao.png"
+          alt=""
+          loading="lazy"
+        >
+        <h2 class="texto-acessivel" id="titulo-escolaridade">Escolaridade</h2>
+        <article class="caixa-visual cartao-formacao cartao-ensino-secundario">
+          <img class="imagem-caixa" src="imagens/cartao-formacao.png" alt="" loading="lazy">
+          <div class="conteudo-caixa texto-formacao">
+            <h3>EEFM Maria Ortiz</h3>
+            <p>
+              (Ensino Secundário)<br>
+              2019 – 2021
+            </p>
+          </div>
+        </article>
+        <article class="caixa-visual cartao-formacao cartao-design-multimedia">
+          <img class="imagem-caixa" src="imagens/cartao-formacao.png" alt="" loading="lazy">
+          <div class="conteudo-caixa texto-formacao">
+            <h3>
+              DMA – Universidade<br>
+              Politécnica de<br>
+              Portalegre
+            </h3>
+            <p>
+              (Ensino Superior)<br>
+              2025 – 2027
+            </p>
+          </div>
+        </article>
+        <article class="caixa-visual cartao-formacao cartao-administracao">
+          <img class="imagem-caixa" src="imagens/cartao-formacao.png" alt="" loading="lazy">
+          <div class="conteudo-caixa texto-formacao">
+            <h3>ADM – Multivix</h3>
+            <p>
+              (Ensino Superior)<br>
+              2023 – 2026
+            </p>
+          </div>
+        </article>
+        <article class="caixa-visual cartao-formacao cartao-curso-blender">
+          <img class="imagem-caixa" src="imagens/cartao-formacao.png" alt="" loading="lazy">
+          <div class="conteudo-caixa texto-formacao">
+            <h3>
+              Blender básico –<br>
+              Domestika
+            </h3>
+            <p>
+              (Curso)<br>
+              2026
+            </p>
+          </div>
+        </article>
+      </section>
+      <!-- Fim da secção 04 · ESCOLARIDADE -->
+      <!--
+        ==================================================================
+        SECÇÃO 05 · HABILIDADES
+        Etiquetas dos programas utilizados.
+        ==================================================================
+      -->
+      <section
+        class="secao-portfolio secao-habilidades"
+        id="habilidades"
+        aria-labelledby="titulo-habilidades"
+      >
+        <img
+          class="camada-fundo fundo-formacao-continuo fundo-formacao-inferior"
+          src="imagens/fundo-formacao.png"
+          alt=""
+          loading="lazy"
+        >
+        <h2 class="texto-acessivel" id="titulo-habilidades">Habilidades</h2>
+        <div class="grade-habilidades">
+          <div class="caixa-visual etiqueta-programa">
+            <img class="imagem-caixa" src="imagens/etiqueta-blender.png" alt="" loading="lazy">
+            <span class="conteudo-caixa">Blender</span>
+          </div>
+          <div class="caixa-visual etiqueta-programa">
+            <img
+              class="imagem-caixa"
+              src="imagens/etiqueta-photoshop.png"
+              alt=""
+              loading="lazy"
+            >
+            <span class="conteudo-caixa">A. Photoshop</span>
+          </div>
+          <div class="caixa-visual etiqueta-programa">
+            <img
+              class="imagem-caixa"
+              src="imagens/etiqueta-illustrator.png"
+              alt=""
+              loading="lazy"
+            >
+            <span class="conteudo-caixa">A. Illustrator</span>
+          </div>
+          <div class="caixa-visual etiqueta-programa">
+            <img class="imagem-caixa" src="imagens/etiqueta-after-effects.png" alt="" loading="lazy">
+            <span class="conteudo-caixa">A. After Effects</span>
+          </div>
+          <div class="caixa-visual etiqueta-programa">
+            <img class="imagem-caixa" src="imagens/etiqueta-figma.png" alt="" loading="lazy">
+            <span class="conteudo-caixa">Figma</span>
+          </div>
+          <div class="caixa-visual etiqueta-programa">
+            <img class="imagem-caixa" src="imagens/etiqueta-visual-studio-code.png" alt="" loading="lazy">
+            <span class="conteudo-caixa">V. S. Code</span>
+          </div>
+        </div>
+      </section>
+      <!-- Fim da secção 05 · HABILIDADES -->
+      <!--
+        ==================================================================
+        SECÇÃO 06 · ABERTURA DOS TRABALHOS
+        Moldura com o título Trabalhos.
+        ==================================================================
+      -->
+      <section
+        class="secao-portfolio secao-abertura-trabalhos"
+        id="trabalhos"
+        aria-labelledby="titulo-trabalhos"
+      >
+        <img class="camada-fundo" src="imagens/fundo-trabalhos.png" alt="" loading="lazy">
+        <div class="caixa-visual quadro-trabalhos">
+          <img class="imagem-caixa" src="imagens/moldura-trabalhos.png" alt="" loading="lazy">
+          <h2 class="conteudo-caixa" id="titulo-trabalhos">
+            <span class="texto-acessivel">Trabalhos</span>
+            <img src="imagens/titulo-trabalhos.png" alt="" loading="lazy">
+          </h2>
+        </div>
+      </section>
+      <!-- Fim da secção 06 · ABERTURA DOS TRABALHOS -->
+      <div class="sequencia-galeria">
+        <!-- Fundo único partilhado pelas secções 07 a 10. Mantém os coelhos e os recortes alinhados. -->
+        <img
+          class="camada-fundo fundo-galeria-continuo"
+          src="imagens/fundo-galeria.png"
+          alt=""
+          loading="lazy"
+        >
+        <!--
+          ==================================================================
+          SECÇÃO 07 · CARTAZES
+          Poster, cartaz e flyer.
+          ==================================================================
+        -->
+        <section
+          class="secao-portfolio secao-galeria secao-cartazes"
+          id="cartazes"
+          aria-labelledby="titulo-cartazes"
+        >
+          <img
+            class="imagem-sobreposta imagem-trabalho imagem-poster"
+            src="imagens/poster-pinkpantheress.png"
+            alt="Composição gráfica de uma artista com roupa axadrezada e recortes fotográficos"
+            loading="lazy"
+          >
+          <img
+            class="imagem-sobreposta imagem-trabalho imagem-cartaz"
+            src="imagens/cartaz-pinkpantheress.png"
+            alt="Cartaz PinkPantheress em vermelho, azul e preto"
+            loading="lazy"
+          >
+          <img
+            class="imagem-sobreposta imagem-trabalho imagem-flyer"
+            src="imagens/flyer-pinkpantheress.png"
+            alt="Flyer ilustrado com uma personagem feminina"
+            loading="lazy"
+          >
+          <article class="caixa-visual legenda legenda-cartazes">
+            <img class="imagem-caixa" src="imagens/cartao-legenda-cartazes.png" alt="" loading="lazy">
+            <h2 class="conteudo-caixa" id="titulo-cartazes">
+              Poster e Flyer
+              <br>
+              <span>Pinkpantheress</span>
+            </h2>
+          </article>
+        </section>
+        <!-- Fim da secção 07 · CARTAZES -->
+        <!--
+          ==================================================================
+          SECÇÃO 08 · ILUSTRAÇÃO VETORIAL
+          Lâmpada e respetiva legenda.
+          ==================================================================
+        -->
+        <section
+          class="secao-portfolio secao-galeria secao-ilustracao-vetorial"
+          id="ilustracao-vetorial"
+          aria-labelledby="titulo-lampada"
+        >
+          <img
+            class="imagem-sobreposta imagem-trabalho trabalho-lampada"
+            src="imagens/ilustracao-lampada.png"
+            alt="Ilustração vetorial de uma lava lamp roxa e vermelha, sobre fundo pêssego"
+            loading="lazy"
+          >
+          <article class="caixa-visual legenda legenda-lampada">
+            <img class="imagem-caixa" src="imagens/cartao-legenda-lampada.png" alt="" loading="lazy">
+            <h2 class="conteudo-caixa" id="titulo-lampada">
+              Ilustração
+              <br>
+              <span>
+                Vetorial Realista<br>
+                Lava Lamp
+              </span>
+            </h2>
+          </article>
+        </section>
+        <!-- Fim da secção 08 · ILUSTRAÇÃO VETORIAL -->
+        <!--
+          ==================================================================
+          SECÇÃO 09 · PERSONAGENS
+          Duas ilustrações e o cartão abaixo dos coelhos.
+          ==================================================================
+        -->
+        <section
+          class="secao-portfolio secao-galeria secao-personagens"
+          id="personagens"
+          aria-labelledby="titulo-personagens"
+        >
+          <img
+            class="imagem-sobreposta imagem-trabalho imagem-personagem-colorida"
+            src="imagens/personagem-colorida.png"
+            alt="Estudo de personagem feminina com cabelo cor-de-rosa e esboços"
+            loading="lazy"
+          >
+          <img
+            class="imagem-sobreposta imagem-trabalho imagem-personagem-preto-branco"
+            src="imagens/personagem-preto-branco.png"
+            alt="Personagem feminina a preto e branco sobre círculo vermelho"
+            loading="lazy"
+          >
+          <article class="caixa-visual legenda legenda-personagens">
+            <img class="imagem-caixa" src="imagens/cartao-legenda-personagens.png" alt="" loading="lazy">
+            <h2 class="conteudo-caixa" id="titulo-personagens">
+              Ilustração digital
+              <br>
+              <span>
+                Design de<br>
+                Personagem
+              </span>
+            </h2>
+          </article>
+        </section>
+        <!-- Fim da secção 09 · PERSONAGENS -->
+        <!--
+          ==================================================================
+          SECÇÃO 10 · CENÁRIO
+          Paisagem digital e respetiva legenda.
+          ==================================================================
+        -->
+        <section
+          class="secao-portfolio secao-galeria secao-cenario"
+          id="cenario"
+          aria-labelledby="titulo-cenario"
+        >
+          <img
+            class="imagem-sobreposta imagem-trabalho trabalho-cenario"
+            src="imagens/cenario-floresta.png"
+            alt="Cenário digital de uma floresta com lago, montanhas e pôr do sol"
+            loading="lazy"
+          >
+          <article class="caixa-visual legenda legenda-cenario">
+            <img class="imagem-caixa" src="imagens/cartao-legenda-cenario.png" alt="" loading="lazy">
+            <h2 class="conteudo-caixa" id="titulo-cenario">
+              Ilustração Digital:
+              <br>
+              <span>Cenário</span>
+            </h2>
+          </article>
+        </section>
+        <!-- Fim da secção 10 · CENÁRIO -->
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,106 @@
+PORTFÓLIO DE BRENNDA VERONEZ — GUIA DE EDIÇÃO
+
+1. COMO ABRIR
+Extraia toda a pasta portfolio. Abra index.html no navegador.
+Mantenha as pastas imagens e fontes junto dos três arquivos de código.
+
+2. PARA QUE SERVE CADA ARQUIVO
+index.html — contém os textos, as imagens e a ordem das secções.
+style.css — contém as cores, fontes, tamanhos, posições e margens.
+script.js — controla o menu e ajusta os textos ao espaço dos cartões.
+imagens — contém as imagens usadas no portfólio, com nomes descritivos.
+fontes — contém os arquivos de fontes locais.
+documentacao/origem-das-imagens.json — relaciona os nomes originais das
+imagens com os nomes atuais. É apenas uma referência; não precisa de editar.
+
+O HTML não contém estilos embutidos. Toda a aparência está no CSS.
+O JavaScript calcula apenas os ajustes automáticos de tamanho e do menu.
+
+3. COMO ENCONTRAR UMA SECÇÃO
+No editor, pressione Ctrl + F e procure SECÇÃO e o número da parte.
+Os mesmos títulos aparecem no HTML e no CSS:
+
+SECÇÃO 01 · CAPA — caderno, nome, contacto e título.
+SECÇÃO 02 · CARTA — envelope e selo decorativos.
+SECÇÃO 03 · SOBRE MIM — fotografia e biografia.
+SECÇÃO 04 · ESCOLARIDADE — quatro cartões com cursos e datas.
+SECÇÃO 05 · HABILIDADES — etiquetas dos programas.
+SECÇÃO 06 · ABERTURA DOS TRABALHOS — título com moldura de renda.
+SECÇÃO 07 · CARTAZES — poster, cartaz e flyer.
+SECÇÃO 08 · ILUSTRAÇÃO VETORIAL — lâmpada.
+SECÇÃO 09 · PERSONAGENS — duas ilustrações e o cartão dos coelhos.
+SECÇÃO 10 · CENÁRIO — paisagem digital.
+
+Cada secção começa e termina com um comentário no HTML.
+No CSS, as secções aparecem na mesma ordem. As regras comuns ficam no início.
+As alterações para ecrãs verticais ficam no fim, num bloco identificado.
+
+4. COMO TROCAR UM TEXTO
+Abra index.html e procure a secção pretendida.
+Edite apenas as palavras entre as etiquetas, por exemplo:
+
+<p>Escreva o novo texto aqui.</p>
+
+Não apague <p>, </p>, <h3> ou outras etiquetas. Elas organizam o conteúdo.
+<br> indica uma quebra de linha.
+Textos muito maiores podem ficar mais pequenos para caber no cartão.
+Para mudar as margens ou o tamanho preferido, edite a regra no CSS.
+
+5. COMO TROCAR UMA IMAGEM
+Procure a imagem em index.html. Por exemplo:
+
+src="imagens/foto-brennda.png"
+
+Coloque a nova imagem na pasta imagens e atualize o nome em src.
+Evite espaços e acentos nos nomes de arquivos.
+O atributo alt contém uma descrição curta da imagem para acessibilidade.
+Uma imagem com proporções diferentes pode exigir um ajuste no CSS.
+
+6. COMO AJUSTAR POSIÇÕES E TAMANHOS
+Abra style.css. Procure o nome da classe usada no HTML.
+Exemplo: class="imagem-sobreposta retrato" usa a regra .retrato no CSS.
+
+left — distância a partir do lado esquerdo da secção.
+top — distância a partir do topo da secção.
+width — largura do elemento.
+height — altura do elemento.
+font-size — tamanho das letras.
+line-height — espaço entre as linhas.
+text-align — alinhamento do texto.
+inset — margens internas de posicionamento: topo, direita, baixo e esquerda.
+
+Exemplo: inset: 22% 8% 12% 34%; reserva 22% no topo, 8% à direita,
+12% em baixo e 34% à esquerda, dentro do respetivo cartão.
+Não é a margem externa da página: é a área ocupada pelo texto no cartão.
+
+% — medida relativa à secção ou ao cartão que contém o elemento.
+vw — medida relativa à largura da janela.
+svh — medida relativa à altura visível da janela.
+rem — medida relativa ao tamanho base da fonte do navegador.
+
+7. NOMES QUE AJUDAM A IDENTIFICAR O CONTEÚDO
+.secao-sobre-mim — a secção inteira da biografia.
+.retrato — apenas a fotografia.
+.biografia — apenas a área de texto do cartão.
+.cartao-ensino-secundario — cartão da EEFM Maria Ortiz.
+.cartao-design-multimedia — cartão do curso DMA.
+.cartao-administracao — cartão da Multivix.
+.cartao-curso-blender — cartão do curso da Domestika.
+.texto-formacao — texto dentro dos quatro cartões de escolaridade.
+.imagem-poster — poster maior da galeria.
+.imagem-personagem-colorida — ilustração da personagem colorida.
+
+Um nome com ponto, como .retrato, corresponde a uma classe do HTML.
+Um identificador, como id="sobre-mim", permite ao menu saltar para a secção.
+Se mudar um identificador, atualize também o respetivo href no menu.
+
+8. FUNDO CONTÍNUO DA GALERIA
+As secções 07 a 10 partilham a mesma imagem de fundo.
+Os coelhos e os recortes já fazem parte desse fundo. Por isso, a imagem
+fica no grupo sequencia-galeria, antes das quatro secções.
+Os cartões e as ilustrações são posicionados por cima dele.
+
+9. DEPOIS DE EDITAR
+Guarde o arquivo e atualize a página no navegador.
+Faça uma alteração de cada vez para perceber o resultado.
+Se uma alteração no CSS não aparecer, use Ctrl + F5.
