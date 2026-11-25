@@ -1,135 +1,5 @@
 
 // ==========================================
-// CONFIGURAÇÃO DA CÂMARA
-// ==========================================
-
-if (navigator.mediaDevices?.getUserMedia) {
-
-    const getUserMediaOriginal =
-        navigator.mediaDevices.getUserMedia.bind(
-            navigator.mediaDevices
-        );
-
-    navigator.mediaDevices.getUserMedia =
-        async function (constraints) {
-
-        if (!constraints?.video) {
-            return getUserMediaOriginal(constraints);
-        }
-
-        const videoOriginal =
-            typeof constraints.video === "object"
-                ? constraints.video
-                : {};
-
-        const novasConfiguracoes = {
-
-            ...constraints,
-
-            video: {
-                ...videoOriginal,
-
-                facingMode: {
-                    ideal: "environment"
-                },
-
-                width: {
-                    ideal: 1920
-                },
-
-                height: {
-                    ideal: 1080
-                },
-
-                frameRate: {
-                    ideal: 30
-                }
-            }
-        };
-
-        let stream;
-
-        try {
-
-            stream = await getUserMediaOriginal(
-                novasConfiguracoes
-            );
-
-        } catch (error) {
-
-            stream = await getUserMediaOriginal(
-                constraints
-            );
-
-        }
-
-        const track = stream.getVideoTracks()[0];
-
-        if (track && track.getCapabilities) {
-
-            const capacidades = track.getCapabilities();
-
-            const ajustes = [];
-
-            // FOCAGEM AUTOMÁTICA CONTÍNUA
-
-            if (capacidades.focusMode?.includes(
-                "continuous"
-            )) {
-
-                ajustes.push({
-                    focusMode: "continuous"
-                });
-
-            }
-
-            // EXPOSIÇÃO AUTOMÁTICA
-
-            if (capacidades.exposureMode?.includes(
-                "continuous"
-            )) {
-
-                ajustes.push({
-                    exposureMode: "continuous"
-                });
-
-            }
-
-            for (const ajuste of ajustes) {
-
-                try {
-
-                    await track.applyConstraints({
-                        ...track.getConstraints(),
-                        advanced: [ajuste]
-                    });
-
-                } catch (error) {
-
-                    console.warn(
-                        "Ajuste não suportado:",
-                        ajuste
-                    );
-
-                }
-
-            }
-
-            console.log(
-                "Configuração da câmara:",
-                track.getSettings()
-            );
-
-        }
-
-        return stream;
-
-    };
-
-}
-
-
-// ==========================================
 // CONFIGURAÇÃO DA ANIMAÇÃO
 // ==========================================
 
@@ -184,11 +54,8 @@ AFRAME.registerComponent("sequencia-envelope", {
         this.material = new THREE.MeshBasicMaterial({
 
             map: this.texture,
-
             transparent: true,
-
             depthWrite: false,
-
             side: THREE.DoubleSide
 
         });
@@ -198,9 +65,7 @@ AFRAME.registerComponent("sequencia-envelope", {
             const mesh = this.el.getObject3D("mesh");
 
             if (mesh) {
-
                 mesh.material = this.material;
-
             }
 
         };
@@ -220,9 +85,7 @@ AFRAME.registerComponent("sequencia-envelope", {
     loadFrame: function (number) {
 
         if (this.frames.has(number)) {
-
             return;
-
         }
 
         const image = new Image();
@@ -230,7 +93,6 @@ AFRAME.registerComponent("sequencia-envelope", {
         const frame = {
 
             image: image,
-
             ready: false
 
         };
@@ -278,21 +140,14 @@ AFRAME.registerComponent("sequencia-envelope", {
         const frame = this.frames.get(number);
 
         if (!frame || !frame.ready) {
-
             return false;
-
         }
 
         this.ctx.clearRect(
-
             0,
-
             0,
-
             this.canvas.width,
-
             this.canvas.height
-
         );
 
         this.ctx.drawImage(frame.image, 0, 0);
@@ -307,10 +162,10 @@ AFRAME.registerComponent("sequencia-envelope", {
     start: function () {
 
         this.currentFrame = 1;
-
         this.lastTime = 0;
-
         this.playing = true;
+
+        this.frames.clear();
 
         this.preloadFrames(1);
 
@@ -335,15 +190,11 @@ AFRAME.registerComponent("sequencia-envelope", {
     tick: function (time) {
 
         if (!this.playing) {
-
             return;
-
         }
 
         if (time - this.lastTime < FRAME_DURATION) {
-
             return;
-
         }
 
         const success = this.drawFrame(
@@ -404,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    // ENVELOPE RECONHECIDO
+    // SELO RECONHECIDO
 
     marcador.addEventListener("targetFound", () => {
 
@@ -413,7 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         estado.textContent =
-            "Envelope reconhecido!";
+            "Selo reconhecido!";
 
         animacao.components[
             "sequencia-envelope"
@@ -422,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // ENVELOPE PERDIDO
+    // SELO PERDIDO
 
     marcador.addEventListener("targetLost", () => {
 
@@ -431,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         estado.textContent =
-            "Aponta novamente para o envelope.";
+            "Volta a apontar para o selo dourado.";
 
         animacao.components[
             "sequencia-envelope"
@@ -445,7 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
     scene.addEventListener("arReady", () => {
 
         estado.textContent =
-            "Aponta a câmara para o envelope.";
+            "Aponta a câmara para o selo dourado.";
 
     });
 
@@ -455,15 +306,17 @@ document.addEventListener("DOMContentLoaded", () => {
     scene.addEventListener("arError", () => {
 
         estado.textContent =
-            "Não foi possível iniciar a experiência AR.";
+            "Não foi possível iniciar a realidade aumentada.";
 
     });
 
 
+    // INICIAR MINDAR
+
     async function iniciarAR() {
 
         estado.textContent =
-            "A preparar a câmara...";
+            "A iniciar a câmara...";
 
         try {
 
@@ -477,7 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error(error);
 
             estado.textContent =
-                "Verifica as permissões da câmara e o marcador.";
+                "Verifica as permissões da câmara.";
 
         }
 
@@ -491,13 +344,9 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
 
         scene.addEventListener(
-
             "loaded",
-
             iniciarAR,
-
             { once: true }
-
         );
 
     }
