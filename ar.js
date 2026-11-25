@@ -1,4 +1,6 @@
 
+// CONFIGURAÇÃO DA ANIMAÇÃO
+
 const TOTAL_FRAMES = 220;
 const FPS = 20;
 const FRAME_DURATION = 1000 / FPS;
@@ -16,6 +18,8 @@ function framePath(number) {
 
 }
 
+
+// COMPONENTE DA ANIMAÇÃO
 
 AFRAME.registerComponent("sequencia-envelope", {
 
@@ -57,7 +61,9 @@ AFRAME.registerComponent("sequencia-envelope", {
             const mesh = this.el.getObject3D("mesh");
 
             if (mesh) {
+
                 mesh.material = this.material;
+
             }
 
         };
@@ -76,9 +82,7 @@ AFRAME.registerComponent("sequencia-envelope", {
 
     loadFrame: function (number) {
 
-        if (this.frames.has(number)) {
-            return;
-        }
+        if (this.frames.has(number)) return;
 
         const image = new Image();
 
@@ -181,9 +185,7 @@ AFRAME.registerComponent("sequencia-envelope", {
 
     tick: function (time) {
 
-        if (!this.playing) {
-            return;
-        }
+        if (!this.playing) return;
 
         if (time - this.lastTime < FRAME_DURATION) {
             return;
@@ -226,6 +228,8 @@ AFRAME.registerComponent("sequencia-envelope", {
 });
 
 
+// INICIAR REALIDADE AUMENTADA
+
 document.addEventListener("DOMContentLoaded", () => {
 
     const scene = document.querySelector("a-scene");
@@ -243,6 +247,8 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
+    // SELO RECONHECIDO
+
     marcador.addEventListener("targetFound", () => {
 
         document.body.classList.add(
@@ -250,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         estado.textContent =
-            "Envelope reconhecido!";
+            "Selo reconhecido!";
 
         animacao.components[
             "sequencia-envelope"
@@ -259,6 +265,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
+    // PERDA DO MARCADOR
+
     marcador.addEventListener("targetLost", () => {
 
         document.body.classList.remove(
@@ -266,7 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         estado.textContent =
-            "Volta a apontar para o envelope.";
+            "Volta a apontar para o selo dourado.";
 
         animacao.components[
             "sequencia-envelope"
@@ -275,18 +283,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
+    // CÂMARA PREPARADA
+
     scene.addEventListener("arReady", () => {
 
         estado.textContent =
-            "Aponta a câmara para o envelope completo.";
+            "Aponta a câmara para o selo dourado.";
 
     });
 
 
+    // ERRO
+
     scene.addEventListener("arError", () => {
 
         estado.textContent =
-            "Não foi possível iniciar a realidade aumentada.";
+            "Não foi possível iniciar a experiência AR.";
 
     });
 

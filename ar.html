@@ -7,229 +7,91 @@
     <meta charset="UTF-8">
 
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>Teste de Câmara</title>
+    <title>Experiência AR | Portefólio</title>
 
-    <style>
+    <link rel="stylesheet" href="ar.css?v=9">
 
-        * {
-            box-sizing: border-box;
-        }
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-        body {
-            margin: 0;
-            background: black;
-            font-family: Arial, sans-serif;
-        }
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-        video {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: none;
-        }
-
-        .controlos {
-            position: fixed;
-            bottom: 20px;
-            left: 5%;
-            width: 90%;
-            padding: 15px;
-            background: rgba(0,0,0,0.8);
-            border-radius: 10px;
-            color: white;
-        }
-
-        button, select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 8px;
-            font-size: 15px;
-        }
-
-        #estado {
-            font-size: 13px;
-        }
-
-    </style>
+    <script src="ar.js?v=9"></script>
 
 </head>
 
 <body>
 
-    <video id="camera" autoplay playsinline muted></video>
+    <div id="interface-ar">
 
-    <div class="controlos">
+        <a href="index.html" class="voltar">
+            ← Voltar ao portefólio
+        </a>
 
-        <select id="listaCamaras"></select>
+        <div class="instrucoes">
 
-        <button id="trocar">
-            Selecionar câmara
-        </button>
+            <h1>Experiência AR</h1>
 
-        <button id="focar">
-            Ajustar foco
-        </button>
+            <p id="estado">
+                A carregar a experiência...
+            </p>
 
-        <p id="estado">A iniciar a câmara...</p>
+        </div>
+
+        <div class="moldura-ar"></div>
 
     </div>
 
-    <script>
-
-        const video = document.getElementById("camera");
-
-        const lista = document.getElementById("listaCamaras");
-
-        const estado = document.getElementById("estado");
-
-        let stream;
-
-
-        async function iniciarCamera(deviceId = null) {
-
-            if (stream) {
-
-                stream.getTracks().forEach(
-                    track => track.stop()
-                );
-
-            }
-
-            try {
-
-                const configuracao = deviceId
-                    ? { deviceId: { exact: deviceId } }
-                    : { facingMode: { ideal: "environment" } };
-
-                stream = await navigator.mediaDevices.getUserMedia({
-
-                    audio: false,
-
-                    video: configuracao
-
-                });
-
-                video.srcObject = stream;
-
-                await video.play();
-
-                await listarCamaras();
-
-                mostrarConfiguracao();
-
-            } catch (erro) {
-
-                estado.textContent = erro.message;
-
-            }
-
-        }
-
-
-        async function listarCamaras() {
-
-            const dispositivos =
-                await navigator.mediaDevices.enumerateDevices();
-
-            const cameras = dispositivos.filter(
-                dispositivo => dispositivo.kind === "videoinput"
-            );
-
-            lista.innerHTML = "";
-
-            cameras.forEach((camera, index) => {
-
-                const opcao = document.createElement("option");
-
-                opcao.value = camera.deviceId;
-
-                opcao.textContent =
-                    camera.label || `Câmara ${index + 1}`;
-
-                lista.appendChild(opcao);
-
-            });
-
-            lista.value =
-                stream.getVideoTracks()[0]
-                    .getSettings().deviceId;
-
-        }
-
-
-        function mostrarConfiguracao() {
-
-            const track = stream.getVideoTracks()[0];
-
-            const dados = track.getSettings();
-
-            estado.textContent =
-                `${track.label} | ` +
-                `${dados.width} × ${dados.height}`;
-
-        }
-
-
-        async function ajustarFoco() {
-
-            if (!stream) return;
-
-            const track = stream.getVideoTracks()[0];
-
-            const capacidades =
-                track.getCapabilities?.() || {};
-
-            try {
-
-                if (capacidades.focusMode?.includes("continuous")) {
-
-                    await track.applyConstraints({
-
-                        ...track.getConstraints(),
-
-                        advanced: [
-                            { focusMode: "continuous" }
-                        ]
-
-                    });
-
-                    estado.textContent =
-                        "Focagem solicitada: " +
-                        (track.getSettings().focusMode || "não confirmada");
-
-                } else {
-
-                    estado.textContent =
-                        "Esta câmara não disponibiliza controlo de foco ao navegador.";
-
-                }
-
-            } catch (erro) {
-
-                estado.textContent = erro.message;
-
-            }
-
-        }
-
-
-        document.getElementById("trocar").onclick = () => {
-
-            iniciarCamera(lista.value);
-
-        };
-
-
-        document.getElementById("focar").onclick = ajustarFoco;
-
-
-        iniciarCamera();
-
-    </script>
+    <a-scene
+        mindar-image="
+            imageTargetSrc: ./targets%20(1).mind;
+            autoStart: false;
+            maxTrack: 1;
+            filterMinCF: 0.001;
+            filterBeta: 1000;
+            warmupTolerance: 2;
+            missTolerance: 15;
+            uiLoading: no;
+            uiScanning: no;
+            uiError: no;
+        "
+        color-space="sRGB"
+        renderer="colorManagement: true; alpha: true;"
+        vr-mode-ui="enabled: false"
+        device-orientation-permission-ui="enabled: false"
+        embedded
+    >
+
+        <a-camera
+            position="0 0 0"
+            look-controls="enabled: false">
+        </a-camera>
+
+        <a-entity
+            id="marcador"
+            mindar-image-target="targetIndex: 0">
+
+            <a-plane
+                id="animacao-envelope"
+                width="10.40"
+                height="11.818182"
+                position="0 4.55 0.001"
+                rotation="0 0 0"
+                material="
+                    shader: flat;
+                    transparent: true;
+                    side: double;
+                    depthWrite: false;
+                "
+                visible="false"
+                sequencia-envelope>
+
+            </a-plane>
+
+        </a-entity>
+
+    </a-scene>
 
 </body>
 
