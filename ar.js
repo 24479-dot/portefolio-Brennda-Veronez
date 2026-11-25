@@ -1,8 +1,4 @@
 
-// ==========================================
-// CONFIGURAÇÃO DA ANIMAÇÃO
-// ==========================================
-
 const TOTAL_FRAMES = 220;
 const FPS = 20;
 const FRAME_DURATION = 1000 / FPS;
@@ -20,10 +16,6 @@ function framePath(number) {
 
 }
 
-
-// ==========================================
-// COMPONENTE DA ANIMAÇÃO
-// ==========================================
 
 AFRAME.registerComponent("sequencia-envelope", {
 
@@ -234,10 +226,6 @@ AFRAME.registerComponent("sequencia-envelope", {
 });
 
 
-// ==========================================
-// INICIAR REALIDADE AUMENTADA
-// ==========================================
-
 document.addEventListener("DOMContentLoaded", () => {
 
     const scene = document.querySelector("a-scene");
@@ -255,8 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    // SELO RECONHECIDO
-
     marcador.addEventListener("targetFound", () => {
 
         document.body.classList.add(
@@ -264,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         estado.textContent =
-            "Selo reconhecido!";
+            "Envelope reconhecido!";
 
         animacao.components[
             "sequencia-envelope"
@@ -273,8 +259,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // SELO PERDIDO
-
     marcador.addEventListener("targetLost", () => {
 
         document.body.classList.remove(
@@ -282,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         estado.textContent =
-            "Volta a apontar para o selo dourado.";
+            "Volta a apontar para o envelope.";
 
         animacao.components[
             "sequencia-envelope"
@@ -291,17 +275,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // CÂMARA PREPARADA
-
     scene.addEventListener("arReady", () => {
 
         estado.textContent =
-            "Aponta a câmara para o selo dourado.";
+            "Aponta a câmara para o envelope completo.";
 
     });
 
-
-    // ERRO
 
     scene.addEventListener("arError", () => {
 
@@ -310,8 +290,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-
-    // INICIAR MINDAR
 
     async function iniciarAR() {
 
@@ -330,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error(error);
 
             estado.textContent =
-                "Verifica as permissões da câmara.";
+                "Verifica a câmara e o marcador.";
 
         }
 
