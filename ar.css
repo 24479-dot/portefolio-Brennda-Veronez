@@ -1,4 +1,6 @@
 
+/* CONFIGURAÇÕES GERAIS */
+
 * {
     margin: 0;
     padding: 0;
@@ -20,110 +22,236 @@ body {
     isolation: isolate;
 }
 
+
 /* CÂMARA */
 
 body > video {
+
     position: absolute;
+
     z-index: 0 !important;
+
     display: block !important;
+
     visibility: visible !important;
+
     opacity: 1 !important;
-    pointer-events: none;
+
+    pointer-events: none !important;
+
+    /* Luminosidade e contraste da câmara */
+
+    filter: brightness(0.68)
+            contrast(1.08)
+            saturate(0.95);
+
 }
 
-/* REALIDADE AUMENTADA */
+
+/* CENA DE REALIDADE AUMENTADA */
 
 a-scene {
+
     position: absolute !important;
+
     inset: 0;
+
     width: 100%;
+
     height: 100%;
+
     background: transparent !important;
+
     z-index: 1 !important;
+
 }
 
 a-scene canvas {
+
     background: transparent !important;
+
 }
 
-/* INTERFACE */
+
+/* INTERFACE DA EXPERIÊNCIA */
 
 #interface-ar {
+
     position: fixed;
+
     inset: 0;
+
     z-index: 10;
+
     pointer-events: none;
+
     background: transparent;
+
 }
+
 
 /* BOTÃO VOLTAR */
 
 .voltar {
+
     position: absolute;
-    top: 22px;
-    left: 22px;
-    padding: 12px 18px;
-    background: #510c19;
+
+    top: max(16px, env(safe-area-inset-top));
+
+    left: 16px;
+
+    padding: 10px 15px;
+
+    background: rgba(81, 12, 25, 0.90);
+
     color: #e8d3a3;
+
     border: 1px solid #c2a36b;
-    border-radius: 5px;
-    font-size: 14px;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+
     text-decoration: none;
+
     pointer-events: auto;
+
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.20);
+
 }
 
-/* INSTRUÇÕES */
+
+/* CAIXA DE INSTRUÇÕES */
 
 .instrucoes {
+
     position: absolute;
-    bottom: 30px;
+
     left: 50%;
+
+    bottom: max(20px, env(safe-area-inset-bottom));
+
     transform: translateX(-50%);
-    width: 90%;
-    max-width: 450px;
-    padding: 22px;
+
+    width: 88%;
+
+    max-width: 360px;
+
+    padding: 15px 18px;
+
     background: rgba(52, 7, 16, 0.85);
+
     border: 1px solid #c2a36b;
+
     border-radius: 8px;
+
     text-align: center;
+
     color: #ead9b5;
+
+    backdrop-filter: blur(3px);
+
+    transition: opacity 0.3s ease;
+
 }
 
 .instrucoes h1 {
-    font-size: 24px;
-    margin-bottom: 12px;
+
+    font-size: 20px;
+
+    margin-bottom: 8px;
+
     font-weight: normal;
+
 }
 
 .instrucoes p {
-    font-size: 14px;
+
+    font-size: 13px;
+
     line-height: 1.5;
+
 }
 
-/* MOLDURA DE RECONHECIMENTO */
+
+/* ZONA DE RECONHECIMENTO */
 
 .moldura-ar {
+
     position: absolute;
-    top: 48%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80%;
-    max-width: 480px;
-    aspect-ratio: 850 / 437;
-    border: 2px dashed rgba(232, 211, 163, 0.7);
-    border-radius: 8px;
-    transition: opacity 0.3s ease;
+
+    inset: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    border: none;
+
+    background: transparent;
+
+    pointer-events: none;
+
 }
+
+
+/* QUANDO O SELO É RECONHECIDO */
 
 body.alvo-encontrado .moldura-ar {
+
     opacity: 0;
+
 }
 
-/* OCULTAR BOTÃO DE ECRÃ INTEIRO */
+body.alvo-encontrado .instrucoes {
+
+    opacity: 0;
+
+}
+
+
+/* OCULTAR BOTÕES AUTOMÁTICOS */
 
 .a-enter-vr,
 .a-enter-ar,
 .a-enter-vr-button,
 .a-enter-ar-button {
+
     display: none !important;
+
+}
+
+
+/* ADAPTAÇÃO AO TELEMÓVEL */
+
+@media screen and (max-width: 600px) {
+
+    .voltar {
+
+        font-size: 12px;
+
+        padding: 9px 12px;
+
+    }
+
+    .instrucoes {
+
+        width: 88%;
+
+        padding: 12px 15px;
+
+    }
+
+    .instrucoes h1 {
+
+        font-size: 18px;
+
+    }
+
+    .instrucoes p {
+
+        font-size: 12px;
+
+    }
+
 }
