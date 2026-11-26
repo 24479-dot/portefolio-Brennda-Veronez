@@ -11,19 +11,23 @@
 
     <title>Experiência AR | Portefólio</title>
 
-    <link rel="stylesheet" href="ar.css?v=11">
+    <link rel="stylesheet" href="ar.css?v=13">
 
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script defer src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-    <script src="ar.js?v=11"></script>
+    <script defer src="ar.js?v=13"></script>
 
 </head>
 
 <body>
 
-    <div id="carregamento-ar">
+    <!-- ECRÃ DE CARREGAMENTO -->
+
+    <div id="carregamento-ar"
+         role="status"
+         aria-live="polite">
 
         <div class="conteudo-carregamento">
 
@@ -54,7 +58,9 @@
             <h2>A preparar a experiência AR</h2>
 
             <div class="barra-carregamento">
+
                 <div id="barra-progresso"></div>
+
             </div>
 
             <p id="texto-carregamento">
@@ -65,6 +71,46 @@
 
     </div>
 
+
+    <!-- ECRÃ DE ERRO -->
+
+    <div id="erro-ar" hidden role="alert">
+
+        <div class="conteudo-carregamento">
+
+            <div class="simbolo-erro"
+                 aria-hidden="true">
+                !
+            </div>
+
+            <h2>Ocorreu um erro</h2>
+
+            <p id="mensagem-erro">
+                Não foi possível iniciar a experiência
+                de realidade aumentada.
+            </p>
+
+            <p>
+                Verifica a tua ligação à Internet
+                e as permissões da câmara
+                e tenta novamente.
+            </p>
+
+            <button id="tentar-novamente"
+                    type="button">
+                Tentar novamente
+            </button>
+
+            <a class="regresso" href="index.html">
+                Voltar ao portefólio
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- INTERFACE DA EXPERIÊNCIA -->
 
     <div id="interface-ar">
 
@@ -84,12 +130,43 @@
 
         <div class="moldura-ar"></div>
 
+
+        <!-- CONFIGURAÇÕES DA CÂMARA -->
+
+        <details id="camera-opcoes">
+
+            <summary>Câmara</summary>
+
+            <label for="camera-lista">
+                Selecionar câmara
+            </label>
+
+            <select id="camera-lista"></select>
+
+            <button id="camera-trocar"
+                    type="button">
+                Usar esta câmara
+            </button>
+
+            <button id="camera-foco"
+                    type="button">
+                Ativar foco contínuo
+            </button>
+
+            <p id="camera-info"
+               aria-live="polite">
+            </p>
+
+        </details>
+
     </div>
 
 
+    <!-- CENA MINDAR -->
+
     <a-scene
         mindar-image="
-            imageTargetSrc: ./targets%20(1).mind;
+            imageTargetSrc: ./target%202.mind;
             autoStart: false;
             maxTrack: 1;
             filterMinCF: 0.001;
@@ -118,9 +195,9 @@
 
             <a-plane
                 id="animacao-envelope"
-                width="10.40"
-                height="11.818182"
-                position="0 4.55 0.001"
+                width="1.294118"
+                height="1.470588"
+                position="0 0.392353 0.001"
                 rotation="0 0 0"
                 material="
                     shader: flat;
@@ -136,6 +213,89 @@
         </a-entity>
 
     </a-scene>
+
+
+    <!-- PROTEÇÃO CONTRA ERROS -->
+
+    <script>
+
+        window.arFalhou = false;
+        window.arPronto = false;
+
+        window.mostrarErroAR = function(mensagem) {
+
+            if (window.arFalhou) return;
+
+            window.arFalhou = true;
+
+            clearTimeout(window.limiteAR);
+
+            document.getElementById(
+                "mensagem-erro"
+            ).textContent = mensagem;
+
+            document.getElementById(
+                "carregamento-ar"
+            ).classList.add("oculto");
+
+            document.getElementById(
+                "erro-ar"
+            ).hidden = false;
+
+            try {
+
+                document.querySelector(
+                    "a-scene"
+                ).systems["mindar-image-system"].stop();
+
+            } catch (e) {}
+
+            document.querySelectorAll("video")
+                .forEach(video => {
+
+                    video.srcObject?.getTracks()
+                        .forEach(track => track.stop());
+
+                });
+
+        };
+
+
+        document.getElementById(
+            "tentar-novamente"
+        ).addEventListener("click", () => {
+
+            location.reload();
+
+        });
+
+
+        window.limiteAR = setTimeout(() => {
+
+            if (!window.arPronto) {
+
+                window.mostrarErroAR(
+                    "O carregamento demorou demasiado tempo."
+                );
+
+            }
+
+        }, 60000);
+
+
+        window.addEventListener("error", e => {
+
+            if (e.target?.tagName === "SCRIPT") {
+
+                window.mostrarErroAR(
+                    "Não foi possível carregar os recursos da experiência."
+                );
+
+            }
+
+        }, true);
+
+    </script>
 
 </body>
 

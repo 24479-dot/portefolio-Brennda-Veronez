@@ -1,5 +1,7 @@
 
-/* CONFIGURAÇÕES GERAIS */
+/* ==========================================
+   CONFIGURAÇÕES GERAIS
+========================================== */
 
 * {
     margin: 0;
@@ -21,10 +23,17 @@ body {
     isolation: isolate;
 }
 
+[hidden] {
+    display: none !important;
+}
 
-/* ECRÃ DE CARREGAMENTO */
 
-#carregamento-ar {
+/* ==========================================
+   ECRÃ DE CARREGAMENTO E ERRO
+========================================== */
+
+#carregamento-ar,
+#erro-ar {
     position: fixed;
     inset: 0;
     z-index: 1000;
@@ -41,9 +50,16 @@ body {
 
     color: #e8d3a3;
 
+    padding: 24px;
+
     transition:
         opacity 0.7s ease,
         visibility 0.7s ease;
+}
+
+#erro-ar {
+    z-index: 1001;
+    overflow: auto;
 }
 
 #carregamento-ar.oculto {
@@ -59,29 +75,36 @@ body {
 }
 
 
-/* CÍRCULO DE PROGRESSO */
+/* ==========================================
+   CÍRCULO DE CARREGAMENTO
+========================================== */
 
 .circulo-carregamento {
     position: relative;
+
     width: 135px;
     height: 135px;
+
     margin: 0 auto 28px;
 }
 
 .circulo-carregamento svg {
     width: 100%;
     height: 100%;
+
     transform: rotate(-90deg);
 }
 
 .circulo-fundo {
     fill: none;
+
     stroke: rgba(232, 211, 163, 0.15);
     stroke-width: 2;
 }
 
 #circulo-progresso {
     fill: none;
+
     stroke: #d6b478;
     stroke-width: 2.5;
     stroke-linecap: round;
@@ -94,33 +117,41 @@ body {
 
 #percentagem {
     position: absolute;
+
     top: 50%;
     left: 50%;
 
     transform: translate(-50%, -50%);
 
     font-size: 28px;
-    color: #e8d3a3;
 }
 
 
-/* TEXTO DO CARREGAMENTO */
+/* ==========================================
+   TEXTOS DO CARREGAMENTO
+========================================== */
 
 .conteudo-carregamento h2 {
     font-size: 21px;
     font-weight: normal;
+
     margin-bottom: 24px;
 }
 
-#texto-carregamento {
+#texto-carregamento,
+#erro-ar p {
     margin-top: 18px;
-    font-size: 13px;
+
+    font-size: 14px;
     line-height: 1.5;
+
     color: #d8c3a2;
 }
 
 
-/* BARRA DE PROGRESSO */
+/* ==========================================
+   BARRA DE PROGRESSO
+========================================== */
 
 .barra-carregamento {
     width: 100%;
@@ -133,7 +164,7 @@ body {
 }
 
 #barra-progresso {
-    width: 0%;
+    width: 0;
     height: 100%;
 
     background: #d6b478;
@@ -144,10 +175,60 @@ body {
 }
 
 
-/* CÂMARA — LUMINOSIDADE NATURAL */
+/* ==========================================
+   ECRÃ DE ERRO
+========================================== */
+
+.simbolo-erro {
+    width: 86px;
+    height: 86px;
+
+    border: 1.5px solid #d6b478;
+    border-radius: 50%;
+
+    display: grid;
+    place-items: center;
+
+    font-size: 48px;
+
+    margin: 0 auto 25px;
+
+    color: #d6b478;
+}
+
+#tentar-novamente {
+    display: block;
+
+    width: 100%;
+
+    margin: 28px auto 18px;
+    padding: 14px;
+
+    background: #510d1b;
+    color: #e8d3a3;
+
+    border: 1px solid #d6b478;
+    border-radius: 6px;
+
+    font: inherit;
+    cursor: pointer;
+}
+
+.regresso {
+    color: #d8c3a2;
+
+    font-size: 14px;
+    text-decoration: none;
+}
+
+
+/* ==========================================
+   CÂMARA — LUMINOSIDADE NATURAL
+========================================== */
 
 body > video {
     position: absolute;
+
     z-index: 0 !important;
 
     display: block !important;
@@ -161,7 +242,9 @@ body > video {
 }
 
 
-/* CENA AR */
+/* ==========================================
+   CENA MINDAR
+========================================== */
 
 a-scene {
     position: absolute !important;
@@ -171,6 +254,7 @@ a-scene {
     height: 100%;
 
     background: transparent !important;
+
     z-index: 1 !important;
 }
 
@@ -179,7 +263,9 @@ a-scene canvas {
 }
 
 
-/* INTERFACE */
+/* ==========================================
+   INTERFACE
+========================================== */
 
 #interface-ar {
     position: fixed;
@@ -188,6 +274,7 @@ a-scene canvas {
     z-index: 10;
 
     pointer-events: none;
+
     background: transparent !important;
 }
 
@@ -197,7 +284,9 @@ a-scene canvas {
 }
 
 
-/* BOTÃO VOLTAR */
+/* ==========================================
+   BOTÃO VOLTAR
+========================================== */
 
 .voltar {
     position: absolute;
@@ -220,7 +309,9 @@ a-scene canvas {
 }
 
 
-/* INSTRUÇÕES */
+/* ==========================================
+   INSTRUÇÕES
+========================================== */
 
 .instrucoes {
     position: absolute;
@@ -248,32 +339,24 @@ a-scene canvas {
 
 .instrucoes h1 {
     font-size: 20px;
+
     margin-bottom: 8px;
+
     font-weight: normal;
 }
 
 .instrucoes p {
     font-size: 13px;
+
     line-height: 1.5;
 }
 
 
-/* RECONHECIMENTO EM ECRÃ INTEIRO */
+/* ==========================================
+   ECRÃ INTEIRO, SEM MOLDURA
+========================================== */
 
-.moldura-ar {
-    display: none !important;
-}
-
-
-/* OCULTAR INSTRUÇÕES DURANTE A ANIMAÇÃO */
-
-body.alvo-encontrado .instrucoes {
-    opacity: 0;
-}
-
-
-/* OCULTAR BOTÕES AUTOMÁTICOS */
-
+.moldura-ar,
 .a-enter-vr,
 .a-enter-ar,
 .a-enter-vr-button,
@@ -281,18 +364,89 @@ body.alvo-encontrado .instrucoes {
     display: none !important;
 }
 
+body.alvo-encontrado .instrucoes {
+    opacity: 0;
+}
 
-/* ADAPTAÇÃO AO TELEMÓVEL */
 
-@media screen and (max-width: 600px) {
+/* ==========================================
+   CONFIGURAÇÕES DA CÂMARA
+========================================== */
+
+#camera-opcoes {
+    position: absolute;
+
+    top: max(16px, env(safe-area-inset-top));
+    right: 16px;
+
+    max-width: min(75vw, 290px);
+
+    pointer-events: auto;
+
+    background: rgba(52, 7, 16, 0.94);
+    color: #ead9b5;
+
+    border: 1px solid #c2a36b;
+    border-radius: 6px;
+
+    padding: 9px 12px;
+
+    font-size: 13px;
+}
+
+#camera-opcoes summary {
+    cursor: pointer;
+    text-align: right;
+}
+
+#camera-opcoes[open] summary {
+    margin-bottom: 12px;
+}
+
+#camera-opcoes label {
+    display: block;
+
+    margin: 8px 0;
+}
+
+#camera-opcoes select,
+#camera-opcoes button {
+    display: block;
+
+    width: 100%;
+
+    margin: 8px 0;
+    padding: 8px;
+
+    border: 1px solid #c2a36b;
+    border-radius: 4px;
+
+    background: #510d1b;
+    color: #ead9b5;
+
+    font: inherit;
+}
+
+#camera-info {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+}
+
+
+/* ==========================================
+   ADAPTAÇÃO AO TELEMÓVEL
+========================================== */
+
+@media (max-width: 600px) {
 
     .voltar {
         font-size: 12px;
+
         padding: 9px 12px;
     }
 
     .instrucoes {
-        width: 88%;
         padding: 12px 15px;
     }
 
