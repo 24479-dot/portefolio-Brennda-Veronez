@@ -1,51 +1,382 @@
 
 // ==========================================
-// CONFIGURAÇÕES GERAIS
+// V16 — OTIMIZAÇÃO DA CÂMARA MINDAR
+// ==========================================
+
+const CONFIG_CAMERA = {
+
+    width: 1920,
+
+    height: 1080,
+
+    facingMode: "environment",
+
+    focusMode: "continuous",
+
+    zoom: 1
+
+};
+
+
+// ==========================================
+// CONFIGURAR A CÂMARA ANTES DO MINDAR
+// ==========================================
+
+function otimizarCameraMindAR() {
+
+    const media = navigator.mediaDevices;
+
+    if (!media?.getUserMedia) return;
+
+    const getUserMediaOriginal =
+        media.getUserMedia.bind(media);
+
+
+    media.getUserMedia = async function (constraints) {
+
+        if (!constraints?.video) {
+
+            return getUserMediaOriginal(constraints);
+
+        }
+
+
+        const videoOriginal =
+
+            typeof constraints.video === "object"
+
+                ? { ...constraints.video }
+
+                : {};
+
+
+        let stream;
+
+
+        // Solicitar uma imagem de maior resolução
+
+        try {
+
+            stream = await getUserMediaOriginal({
+
+                ...constraints,
+
+                video: {
+
+                    ...videoOriginal,
+
+                    facingMode: {
+
+                        ideal: CONFIG_CAMERA.facingMode
+
+                    },
+
+                    width: {
+
+                        ideal: CONFIG_CAMERA.width
+
+                    },
+
+                    height: {
+
+                        ideal: CONFIG_CAMERA.height
+
+                    }
+
+                }
+
+            });
+
+        } catch (erro) {
+
+            if (
+                erro.name === "NotAllowedError" ||
+                erro.name === "SecurityError"
+            ) {
+
+                throw erro;
+
+            }
+
+            console.warn(
+
+                "A utilizar a configuração original da câmara.",
+
+                erro
+
+            );
+
+
+            stream = await getUserMediaOriginal(
+
+                constraints
+
+            );
+
+        }
+
+
+        // Obter a câmara selecionada
+
+        const track = stream.getVideoTracks()[0];
+
+
+        if (track) {
+
+            await configurarNitidez(track);
+
+        }
+
+
+        return stream;
+
+    };
+
+}
+
+
+// ==========================================
+// CONFIGURAR FOCO E ZOOM
+// ==========================================
+
+async function configurarNitidez(track) {
+
+    let capacidades = {};
+
+
+    try {
+
+        capacidades =
+            track.getCapabilities?.() || {};
+
+    } catch (erro) {
+
+        console.warn(
+
+            "Não foi possível consultar as capacidades da câmara.",
+
+            erro
+
+        );
+
+    }
+
+
+    // FOCAGEM AUTOMÁTICA CONTÍNUA
+
+    if (
+
+        capacidades.focusMode?.includes("continuous")
+
+    ) {
+
+        try {
+
+            const atuais = track.getConstraints();
+
+            await track.applyConstraints({
+
+                ...atuais,
+
+                advanced: [
+
+                    ...(atuais.advanced || []),
+
+                    {
+
+                        focusMode: "continuous"
+
+                    }
+
+                ]
+
+            });
+
+            console.log(
+
+                "Foco contínuo solicitado."
+
+            );
+
+        } catch (erro) {
+
+            console.warn(
+
+                "Foco contínuo indisponível.",
+
+                erro
+
+            );
+
+        }
+
+    }
+
+
+    // ZOOM NATURAL — 1X
+
+    if (
+
+        capacidades.zoom &&
+
+        capacidades.zoom.min <= 1 &&
+
+        capacidades.zoom.max >= 1
+
+    ) {
+
+        try {
+
+            const atuais = track.getConstraints();
+
+            await track.applyConstraints({
+
+                ...atuais,
+
+                advanced: [
+
+                    ...(atuais.advanced || []),
+
+                    {
+
+                        zoom: 1
+
+                    }
+
+                ]
+
+            });
+
+        } catch (erro) {
+
+            console.warn(
+
+                "Não foi possível ajustar o zoom.",
+
+                erro
+
+            );
+
+        }
+
+    }
+
+
+    // DIAGNÓSTICO DA CÂMARA
+
+    const dados = track.getSettings();
+
+
+    console.group("MINDAR — DIAGNÓSTICO DA CÂMARA");
+
+    console.log("Câmara:", track.label);
+
+    console.log("Resolução:", dados.width, "x", dados.height);
+
+    console.log("FPS:", dados.frameRate);
+
+    console.log("Foco:", dados.focusMode || "Não disponibilizado");
+
+    console.log("Zoom:", dados.zoom ?? "Não disponibilizado");
+
+    console.log("Capacidades:", capacidades);
+
+    console.groupEnd();
+
+
+    window.diagnosticoCamera = {
+
+        camera: track.label,
+
+        width: dados.width,
+
+        height: dados.height,
+
+        fps: dados.frameRate,
+
+        focusMode: dados.focusMode,
+
+        zoom: dados.zoom,
+
+        capabilities: capacidades
+
+    };
+
+}
+
+
+// Aplicar antes de iniciar o MindAR
+
+otimizarCameraMindAR();
+
+
+// ==========================================
+// CONFIGURAÇÕES GERAIS DA ANIMAÇÃO
 // ==========================================
 
 const TOTAL_FRAMES = 220;
+
 const FPS = 20;
+
 const FRAME_DURATION = 1000 / FPS;
 
 const FRAME_FOLDER = "./portfolio_frames_png/";
 
-// Menor consumo de memória no telemóvel
-
 const BUFFER_SIZE = 8;
 
+
 let cameraPreparada = false;
+
 let experienciaIniciada = false;
+
 let carregamentoConcluido = false;
+
 let marcadorEncontrado = false;
+
 
 const $ = id => document.getElementById(id);
 
 
 // ==========================================
-// CARREGAMENTO
+// CARREGAMENTO — MANTIDO
 // ==========================================
 
 function atualizarProgresso(valor, mensagem) {
 
     valor = Math.max(
+
         0,
+
         Math.min(100, valor)
+
     );
 
+
     $("percentagem").textContent =
+
         Math.round(valor) + "%";
 
+
     $("barra-progresso").style.width =
+
         valor + "%";
 
+
     $("circulo-progresso").style.strokeDashoffset =
+
         326.7256 * (1 - valor / 100);
 
+
     $("texto-carregamento").textContent =
+
         mensagem;
 
 }
 
+
+// ==========================================
+// VERIFICAR CARREGAMENTO — MANTIDO
+// ==========================================
 
 function verificarCarregamento() {
 
@@ -65,11 +396,14 @@ function verificarCarregamento() {
 
 
     const componente =
+
         $("animacao-envelope")
+
             ?.components?.["sequencia-envelope"];
 
 
     const primeiroFramePronto =
+
         componente?.frames.get(1)?.ready;
 
 
@@ -109,8 +443,6 @@ function verificarCarregamento() {
     );
 
 
-    // Não esperar por todos os PNG para abrir a câmara
-
     if (cameraPreparada && primeiroFramePronto) {
 
         carregamentoConcluido = true;
@@ -121,8 +453,11 @@ function verificarCarregamento() {
 
 
         atualizarProgresso(
+
             100,
+
             "Experiência preparada!"
+
         );
 
 
@@ -130,7 +465,9 @@ function verificarCarregamento() {
 
             if (window.arFalhou) return;
 
+
             $("carregamento-ar").hidden = true;
+
 
             if (marcadorEncontrado) {
 
@@ -163,14 +500,15 @@ function framePath(number) {
 
 
 // ==========================================
-// FOCAGEM AUTOMÁTICA
+// DIAGNÓSTICO APÓS INICIALIZAÇÃO
 // ==========================================
 
-async function configurarFoco(scene) {
+function verificarCameraMindAR(scene) {
 
     try {
 
         const sistema =
+
             scene.systems["mindar-image-system"];
 
 
@@ -185,55 +523,39 @@ async function configurarFoco(scene) {
 
 
         const track =
+
             video.srcObject.getVideoTracks()[0];
 
 
         if (!track) return;
 
 
-        const capacidades =
-            track.getCapabilities?.() || {};
+        console.log(
 
+            "Resolução efetiva do vídeo MindAR:",
 
-        if (capacidades.focusMode?.includes(
-            "continuous"
-        )) {
+            video.videoWidth,
 
-            await track.applyConstraints({
+            "x",
 
-                ...track.getConstraints(),
+            video.videoHeight
 
-                advanced: [
-
-                    ...(track.getConstraints().advanced || []),
-
-                    {
-                        focusMode: "continuous"
-                    }
-
-                ]
-
-            });
-
-        }
+        );
 
 
         console.log(
 
-            "Configuração da câmara:",
+            "Configurações efetivas:",
 
             track.getSettings()
 
         );
 
-
     } catch (erro) {
-
-        // Uma falha no foco não impede a experiência
 
         console.warn(
 
-            "Ajuste de foco indisponível:",
+            "Diagnóstico da câmara indisponível.",
 
             erro
 
@@ -245,7 +567,7 @@ async function configurarFoco(scene) {
 
 
 // ==========================================
-// VERIFICAÇÃO DAS BIBLIOTECAS
+// VERIFICAR BIBLIOTECAS
 // ==========================================
 
 if (!window.AFRAME) {
@@ -260,7 +582,7 @@ if (!window.AFRAME) {
 
 
 // ==========================================
-// COMPONENTE DA ANIMAÇÃO
+// COMPONENTE DA ANIMAÇÃO — MANTIDO
 // ==========================================
 
     AFRAME.registerComponent("sequencia-envelope", {
@@ -277,7 +599,9 @@ if (!window.AFRAME) {
 
 
             this.canvas =
+
                 document.createElement("canvas");
+
 
             this.canvas.width = 1100;
 
@@ -285,6 +609,7 @@ if (!window.AFRAME) {
 
 
             this.ctx =
+
                 this.canvas.getContext("2d");
 
 
@@ -292,10 +617,12 @@ if (!window.AFRAME) {
 
 
             this.texture =
+
                 new THREE.CanvasTexture(this.canvas);
 
 
             this.texture.colorSpace =
+
                 THREE.SRGBColorSpace;
 
 
@@ -303,14 +630,17 @@ if (!window.AFRAME) {
 
 
             this.texture.minFilter =
+
                 THREE.LinearFilter;
 
 
             this.texture.magFilter =
+
                 THREE.LinearFilter;
 
 
             this.material =
+
                 new THREE.MeshBasicMaterial({
 
                     map: this.texture,
@@ -327,6 +657,7 @@ if (!window.AFRAME) {
             this.applyMaterial = () => {
 
                 const mesh =
+
                     this.el.getObject3D("mesh");
 
 
@@ -353,9 +684,9 @@ if (!window.AFRAME) {
         },
 
 
-        // ======================================
+        // ==================================
         // CARREGAR IMAGENS
-        // ======================================
+        // ==================================
 
         loadFrame: function (number) {
 
@@ -426,9 +757,9 @@ if (!window.AFRAME) {
         },
 
 
-        // ======================================
+        // ==================================
         // PRÉ-CARREGAMENTO
-        // ======================================
+        // ==================================
 
         preloadFrames: function (start) {
 
@@ -448,9 +779,9 @@ if (!window.AFRAME) {
         },
 
 
-        // ======================================
+        // ==================================
         // DESENHAR IMAGEM
-        // ======================================
+        // ==================================
 
         drawFrame: function (number) {
 
@@ -496,9 +827,9 @@ if (!window.AFRAME) {
         },
 
 
-        // ======================================
+        // ==================================
         // INICIAR ANIMAÇÃO
-        // ======================================
+        // ==================================
 
         start: function () {
 
@@ -523,9 +854,9 @@ if (!window.AFRAME) {
         },
 
 
-        // ======================================
+        // ==================================
         // PARAR ANIMAÇÃO
-        // ======================================
+        // ==================================
 
         stop: function () {
 
@@ -545,9 +876,9 @@ if (!window.AFRAME) {
         },
 
 
-        // ======================================
+        // ==================================
         // REPRODUÇÃO DOS 220 FRAMES
-        // ======================================
+        // ==================================
 
         tick: function (time) {
 
@@ -614,10 +945,7 @@ if (!window.AFRAME) {
                 this.currentFrame % TOTAL_FRAMES + 1;
 
 
-            // Manter apenas os frames necessários
-
             const manter = new Set(
-
 
                 Array.from(
 
@@ -653,33 +981,38 @@ if (!window.AFRAME) {
 
 
 // ==========================================
-// INICIALIZAÇÃO DA EXPERIÊNCIA
+// INICIALIZAÇÃO DA EXPERIÊNCIA — MANTIDA
 // ==========================================
 
     document.addEventListener("DOMContentLoaded", () => {
 
         const scene =
+
             document.querySelector("a-scene");
 
 
         const marcador =
+
             $("marcador");
 
 
         const animacao =
+
             $("animacao-envelope");
 
 
         const estado =
+
             $("estado");
 
 
         const botao =
+
             $("iniciar-experiencia");
 
 
 // ==========================================
-// INICIAR ATRAVÉS DO BOTÃO
+// BOTÃO INICIAR EXPERIÊNCIA
 // ==========================================
 
         botao.addEventListener("click", async () => {
@@ -745,8 +1078,6 @@ if (!window.AFRAME) {
             clearTimeout(window.limiteAR);
 
 
-            // Mais tolerância para dispositivos móveis
-
             window.limiteAR = setTimeout(() => {
 
                 if (!window.arPronto) {
@@ -765,6 +1096,7 @@ if (!window.AFRAME) {
             try {
 
                 const sistema =
+
                     scene.systems["mindar-image-system"];
 
 
@@ -779,15 +1111,13 @@ if (!window.AFRAME) {
                 }
 
 
-                // Iniciar MindAR diretamente após o toque
-
                 const arranque = sistema.start();
 
 
-                // Carregar apenas os primeiros 8 frames
-
                 animacao.components[
+
                     "sequencia-envelope"
+
                 ].preloadFrames(1);
 
 
@@ -834,7 +1164,9 @@ if (!window.AFRAME) {
                 try {
 
                     scene.systems[
+
                         "mindar-image-system"
+
                     ].stop();
 
                 } catch (e) {}
@@ -852,9 +1184,7 @@ if (!window.AFRAME) {
                 "Aponta a câmara para o envelope completo.";
 
 
-            // Ajuste de foco sem bloquear a experiência
-
-            configurarFoco(scene);
+            verificarCameraMindAR(scene);
 
 
             verificarCarregamento();
@@ -906,7 +1236,7 @@ if (!window.AFRAME) {
 
 
 // ==========================================
-// PERDA TEMPORÁRIA DO MARCADOR
+// PERDA DO MARCADOR
 // ==========================================
 
         marcador.addEventListener("targetLost", () => {
@@ -936,7 +1266,7 @@ if (!window.AFRAME) {
 
 
 // ==========================================
-// ERRO MINDAR
+// ECRÃ DE ERRO — MANTIDO
 // ==========================================
 
         scene.addEventListener("arError", () => {
@@ -992,7 +1322,7 @@ if (!window.AFRAME) {
 
 
 // ==========================================
-// LIBERTAR A CÂMARA AO SAIR
+// LIBERTAR CÂMARA AO SAIR
 // ==========================================
 
         window.addEventListener("pagehide", () => {
@@ -1000,16 +1330,20 @@ if (!window.AFRAME) {
             try {
 
                 scene.systems[
+
                     "mindar-image-system"
+
                 ].stop();
 
             } catch (e) {}
 
 
             document.querySelectorAll("video")
+
                 .forEach(video => {
 
                     video.srcObject?.getTracks()
+
                         .forEach(track => track.stop());
 
                 });
