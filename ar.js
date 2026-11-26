@@ -1,5 +1,7 @@
 
-// CONFIGURAÇÃO DA ANIMAÇÃO
+// ==========================================
+// CONFIGURAÇÕES DA ANIMAÇÃO
+// ==========================================
 
 const TOTAL_FRAMES = 220;
 const FPS = 20;
@@ -8,6 +10,130 @@ const FRAME_DURATION = 1000 / FPS;
 const FRAME_FOLDER = "./portfolio_frames_png/";
 const BUFFER_SIZE = 24;
 
+let cameraPreparada = false;
+let carregamentoConcluido = false;
+let carregamentoFalhou = false;
+
+
+// ==========================================
+// CONTROLO DO CARREGAMENTO
+// ==========================================
+
+function atualizarProgresso(valor, mensagem) {
+
+    const percentagem =
+        document.getElementById("percentagem");
+
+    const barra =
+        document.getElementById("barra-progresso");
+
+    const circulo =
+        document.getElementById("circulo-progresso");
+
+    const texto =
+        document.getElementById("texto-carregamento");
+
+    if (!percentagem || !barra || !circulo || !texto) {
+        return;
+    }
+
+    percentagem.textContent = Math.round(valor) + "%";
+
+    barra.style.width = valor + "%";
+
+    circulo.style.strokeDashoffset =
+        326.7256 * (1 - valor / 100);
+
+    texto.textContent = mensagem;
+
+}
+
+
+function verificarCarregamento() {
+
+    if (carregamentoConcluido || carregamentoFalhou) {
+        return;
+    }
+
+    const animacao =
+        document.querySelector("#animacao-envelope");
+
+    const componente =
+        animacao?.components?.["sequencia-envelope"];
+
+    let framesProntos = 0;
+
+    if (componente) {
+
+        for (let i = 1; i <= BUFFER_SIZE; i++) {
+
+            if (componente.frames.get(i)?.ready) {
+                framesProntos++;
+            }
+
+        }
+
+    }
+
+    const progresso =
+        10 +
+        (cameraPreparada ? 45 : 0) +
+        (framesProntos / BUFFER_SIZE) * 45;
+
+    if (cameraPreparada && framesProntos === BUFFER_SIZE) {
+
+        carregamentoConcluido = true;
+
+        atualizarProgresso(
+            100,
+            "Experiência preparada!"
+        );
+
+        setTimeout(() => {
+
+            document
+                .getElementById("carregamento-ar")
+                .classList.add("oculto");
+
+        }, 600);
+
+    } else {
+
+        atualizarProgresso(
+
+            Math.min(progresso, 99),
+
+            cameraPreparada
+                ? "A carregar a animação..."
+                : "A preparar a câmara e o reconhecimento..."
+
+        );
+
+    }
+
+}
+
+
+function erroCarregamento(mensagem) {
+
+    carregamentoFalhou = true;
+
+    const texto =
+        document.getElementById("texto-carregamento");
+
+    if (texto) {
+
+        texto.textContent =
+            mensagem + " Atualiza a página para tentar novamente.";
+
+    }
+
+}
+
+
+// ==========================================
+// CAMINHO DOS FRAMES
+// ==========================================
 
 function framePath(number) {
 
@@ -19,7 +145,9 @@ function framePath(number) {
 }
 
 
+// ==========================================
 // COMPONENTE DA ANIMAÇÃO
+// ==========================================
 
 AFRAME.registerComponent("sequencia-envelope", {
 
@@ -44,26 +172,29 @@ AFRAME.registerComponent("sequencia-envelope", {
 
         this.texture.colorSpace = THREE.SRGBColorSpace;
         this.texture.generateMipmaps = false;
+
         this.texture.minFilter = THREE.LinearFilter;
         this.texture.magFilter = THREE.LinearFilter;
 
         this.material = new THREE.MeshBasicMaterial({
 
             map: this.texture,
+
             transparent: true,
+
             depthWrite: false,
+
             side: THREE.DoubleSide
 
         });
 
         this.applyMaterial = () => {
 
-            const mesh = this.el.getObject3D("mesh");
+            const mesh =
+                this.el.getObject3D("mesh");
 
             if (mesh) {
-
                 mesh.material = this.material;
-
             }
 
         };
@@ -82,13 +213,16 @@ AFRAME.registerComponent("sequencia-envelope", {
 
     loadFrame: function (number) {
 
-        if (this.frames.has(number)) return;
+        if (this.frames.has(number)) {
+            return;
+        }
 
         const image = new Image();
 
         const frame = {
 
             image: image,
+
             ready: false
 
         };
@@ -98,6 +232,8 @@ AFRAME.registerComponent("sequencia-envelope", {
         image.onload = () => {
 
             frame.ready = true;
+
+            verificarCarregamento();
 
         };
 
@@ -109,6 +245,14 @@ AFRAME.registerComponent("sequencia-envelope", {
             );
 
             this.frames.delete(number);
+
+            if (!carregamentoConcluido) {
+
+                erroCarregamento(
+                    "Não foi possível carregar a animação."
+                );
+
+            }
 
         };
 
@@ -146,7 +290,11 @@ AFRAME.registerComponent("sequencia-envelope", {
             this.canvas.height
         );
 
-        this.ctx.drawImage(frame.image, 0, 0);
+        this.ctx.drawImage(
+            frame.image,
+            0,
+            0
+        );
 
         this.texture.needsUpdate = true;
 
@@ -185,7 +333,9 @@ AFRAME.registerComponent("sequencia-envelope", {
 
     tick: function (time) {
 
-        if (!this.playing) return;
+        if (!this.playing || !carregamentoConcluido) {
+            return;
+        }
 
         if (time - this.lastTime < FRAME_DURATION) {
             return;
@@ -228,22 +378,28 @@ AFRAME.registerComponent("sequencia-envelope", {
 });
 
 
+// ==========================================
 // INICIAR REALIDADE AUMENTADA
+// ==========================================
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    const scene = document.querySelector("a-scene");
+    const scene =
+        document.querySelector("a-scene");
 
-    const marcador = document.querySelector(
-        "#marcador"
-    );
+    const marcador =
+        document.querySelector("#marcador");
 
-    const animacao = document.querySelector(
-        "#animacao-envelope"
-    );
+    const animacao =
+        document.querySelector("#animacao-envelope");
 
-    const estado = document.querySelector(
-        "#estado"
+    const estado =
+        document.querySelector("#estado");
+
+
+    atualizarProgresso(
+        0,
+        "A iniciar a experiência..."
     );
 
 
@@ -258,9 +414,20 @@ document.addEventListener("DOMContentLoaded", () => {
         estado.textContent =
             "Selo reconhecido!";
 
-        animacao.components[
-            "sequencia-envelope"
-        ].start();
+        const componente =
+            animacao.components["sequencia-envelope"];
+
+        if (carregamentoConcluido) {
+
+            componente.start();
+
+        } else {
+
+            componente.currentFrame = 1;
+            componente.lastTime = 0;
+            componente.playing = true;
+
+        }
 
     });
 
@@ -287,26 +454,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
     scene.addEventListener("arReady", () => {
 
+        cameraPreparada = true;
+
         estado.textContent =
             "Aponta a câmara para o selo dourado.";
+
+        verificarCarregamento();
 
     });
 
 
-    // ERRO
+    // ERRO NA REALIDADE AUMENTADA
 
     scene.addEventListener("arError", () => {
 
         estado.textContent =
-            "Não foi possível iniciar a experiência AR.";
+            "Não foi possível iniciar a realidade aumentada.";
+
+        erroCarregamento(
+            "Verifica as permissões da câmara e o marcador."
+        );
 
     });
 
 
+    // INICIAR MINDAR
+
     async function iniciarAR() {
+
+        atualizarProgresso(
+            10,
+            "A iniciar a câmara..."
+        );
 
         estado.textContent =
             "A iniciar a câmara...";
+
+        verificarCarregamento();
 
         try {
 
@@ -319,8 +503,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             console.error(error);
 
-            estado.textContent =
-                "Verifica a câmara e o marcador.";
+            erroCarregamento(
+                "Não foi possível iniciar a câmara."
+            );
 
         }
 
@@ -334,9 +519,13 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
 
         scene.addEventListener(
+
             "loaded",
+
             iniciarAR,
+
             { once: true }
+
         );
 
     }

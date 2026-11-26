@@ -11,17 +11,60 @@
 
     <title>Experiência AR | Portefólio</title>
 
-    <link rel="stylesheet" href="ar.css?v=10">
+    <link rel="stylesheet" href="ar.css?v=11">
 
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-    <script src="ar.js?v=10"></script>
+    <script src="ar.js?v=11"></script>
 
 </head>
 
 <body>
+
+    <div id="carregamento-ar">
+
+        <div class="conteudo-carregamento">
+
+            <div class="circulo-carregamento">
+
+                <svg viewBox="0 0 120 120">
+
+                    <circle
+                        class="circulo-fundo"
+                        cx="60"
+                        cy="60"
+                        r="52">
+                    </circle>
+
+                    <circle
+                        id="circulo-progresso"
+                        cx="60"
+                        cy="60"
+                        r="52">
+                    </circle>
+
+                </svg>
+
+                <span id="percentagem">0%</span>
+
+            </div>
+
+            <h2>A preparar a experiência AR</h2>
+
+            <div class="barra-carregamento">
+                <div id="barra-progresso"></div>
+            </div>
+
+            <p id="texto-carregamento">
+                A iniciar...
+            </p>
+
+        </div>
+
+    </div>
+
 
     <div id="interface-ar">
 
@@ -42,6 +85,7 @@
         <div class="moldura-ar"></div>
 
     </div>
+
 
     <a-scene
         mindar-image="

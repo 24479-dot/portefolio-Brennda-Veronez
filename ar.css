@@ -22,7 +22,129 @@ body {
 }
 
 
-/* CÂMARA ORIGINAL */
+/* ECRÃ DE CARREGAMENTO */
+
+#carregamento-ar {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: radial-gradient(
+        ellipse at center,
+        #510d1b,
+        #23050c
+    );
+
+    color: #e8d3a3;
+
+    transition:
+        opacity 0.7s ease,
+        visibility 0.7s ease;
+}
+
+#carregamento-ar.oculto {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.conteudo-carregamento {
+    width: 85%;
+    max-width: 340px;
+    text-align: center;
+}
+
+
+/* CÍRCULO DE PROGRESSO */
+
+.circulo-carregamento {
+    position: relative;
+    width: 135px;
+    height: 135px;
+    margin: 0 auto 28px;
+}
+
+.circulo-carregamento svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circulo-fundo {
+    fill: none;
+    stroke: rgba(232, 211, 163, 0.15);
+    stroke-width: 2;
+}
+
+#circulo-progresso {
+    fill: none;
+    stroke: #d6b478;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+
+    stroke-dasharray: 326.7256;
+    stroke-dashoffset: 326.7256;
+
+    transition: stroke-dashoffset 0.3s ease;
+}
+
+#percentagem {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    font-size: 28px;
+    color: #e8d3a3;
+}
+
+
+/* TEXTO DO CARREGAMENTO */
+
+.conteudo-carregamento h2 {
+    font-size: 21px;
+    font-weight: normal;
+    margin-bottom: 24px;
+}
+
+#texto-carregamento {
+    margin-top: 18px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #d8c3a2;
+}
+
+
+/* BARRA DE PROGRESSO */
+
+.barra-carregamento {
+    width: 100%;
+    height: 3px;
+
+    background: rgba(232, 211, 163, 0.15);
+
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#barra-progresso {
+    width: 0%;
+    height: 100%;
+
+    background: #d6b478;
+
+    border-radius: 10px;
+
+    transition: width 0.3s ease;
+}
+
+
+/* CÂMARA — LUMINOSIDADE NATURAL */
 
 body > video {
     position: absolute;
@@ -64,10 +186,9 @@ a-scene canvas {
     inset: 0;
 
     z-index: 10;
-    pointer-events: none;
 
+    pointer-events: none;
     background: transparent !important;
-    backdrop-filter: none !important;
 }
 
 #interface-ar::before,
@@ -137,7 +258,7 @@ a-scene canvas {
 }
 
 
-/* RECONHECIMENTO NO ECRÃ INTEIRO */
+/* RECONHECIMENTO EM ECRÃ INTEIRO */
 
 .moldura-ar {
     display: none !important;
@@ -161,7 +282,7 @@ body.alvo-encontrado .instrucoes {
 }
 
 
-/* TELEMÓVEL */
+/* ADAPTAÇÃO AO TELEMÓVEL */
 
 @media screen and (max-width: 600px) {
 
@@ -181,6 +302,10 @@ body.alvo-encontrado .instrucoes {
 
     .instrucoes p {
         font-size: 12px;
+    }
+
+    .conteudo-carregamento h2 {
+        font-size: 19px;
     }
 
 }
