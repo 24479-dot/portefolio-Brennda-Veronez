@@ -8,7 +8,7 @@
 "use strict";
 
 const TOTAL_FRAMES = 220;
-const FPS = 20;
+const FPS = 25;
 const FRAME_DURATION = 1000 / FPS;
 
 const FRAME_FOLDER = "./portfolio_frames_png/";
