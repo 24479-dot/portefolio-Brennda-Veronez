@@ -1,7 +1,8 @@
 
 // ==================================================
-// V24 — MINDAR
-// ANIMAÇÃO 2D COM POSIÇÃO FIXA
+// V27 — MINDAR
+// ARRANQUE RAPIDO COM PNG ORIGINAIS
+// POSICAO 2D FIXA E CALIBRACAO V25
 // ==================================================
 
 "use strict";
@@ -15,7 +16,8 @@ const FRAME_FOLDER = "./portfolio_frames_png/";
 const CANVAS_WIDTH = 880;
 const CANVAS_HEIGHT = 1000;
 
-const BUFFER_SIZE = 16;
+const INITIAL_BUFFER = 12;
+const BUFFER_SIZE = 24;
 const MAX_DOWNLOADS = 6;
 
 const TEMPO_ESTABILIZACAO = 300;
@@ -27,11 +29,13 @@ let carregamentoConcluido = false;
 let marcadorEncontrado = false;
 let posicaoBloqueada = false;
 
+let instanteReconhecimento = null;
+
 const $ = id => document.getElementById(id);
 
 
 // ==================================================
-// PROGRESSO DO CARREGAMENTO
+// CARREGAMENTO
 // ==================================================
 
 function atualizarProgresso(valor, mensagem) {
@@ -69,7 +73,7 @@ function verificarCarregamento() {
 
     let prontos = 0;
 
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= INITIAL_BUFFER; i++) {
 
         if (componente.frames.get(i)?.ready) {
 
@@ -82,7 +86,7 @@ function verificarCarregamento() {
     const progresso =
         10 +
         (cameraPreparada ? 60 : 0) +
-        29 * prontos / 4;
+        29 * prontos / INITIAL_BUFFER;
 
     atualizarProgresso(
 
@@ -93,6 +97,10 @@ function verificarCarregamento() {
             : "A iniciar a câmara..."
 
     );
+
+
+    // Não esperar pelo carregamento completo
+    // dos primeiros 12 frames.
 
     if (
         cameraPreparada &&
@@ -110,19 +118,15 @@ function verificarCarregamento() {
             "Experiência preparada!"
         );
 
-        setTimeout(() => {
 
-            if (window.arFalhou) return;
+        $("carregamento-ar").hidden = true;
 
-            $("carregamento-ar").hidden = true;
 
-            if (marcadorEncontrado) {
+        if (marcadorEncontrado) {
 
-                componente.prepararBloqueio();
+            componente.prepararBloqueio();
 
-            }
-
-        }, 100);
+        }
 
     }
 
@@ -130,7 +134,7 @@ function verificarCarregamento() {
 
 
 // ==================================================
-// CAMINHO DAS IMAGENS
+// CAMINHO DOS FRAMES PNG
 // ==================================================
 
 function framePath(number) {
@@ -144,7 +148,7 @@ function framePath(number) {
 
 
 // ==================================================
-// CONFIGURAÇÃO DA CÂMARA
+// CONFIGURACAO DA CAMARA
 // ==================================================
 
 async function configurarFoco(scene) {
@@ -165,6 +169,7 @@ async function configurarFoco(scene) {
 
         const capacidades =
             track.getCapabilities?.() || {};
+
 
         if (
             capacidades.focusMode?.includes("continuous")
@@ -191,15 +196,16 @@ async function configurarFoco(scene) {
 
         }
 
+
         console.log(
-            "V24 — Câmara:",
+            "V27 — Câmara:",
             track.getSettings()
         );
 
     } catch (erro) {
 
         console.warn(
-            "Foco automático indisponível.",
+            "Ajuste de foco indisponível.",
             erro
         );
 
@@ -209,7 +215,7 @@ async function configurarFoco(scene) {
 
 
 // ==================================================
-// COMPONENTE MINDAR
+// COMPONENTE DA ANIMACAO
 // ==================================================
 
 if (!window.AFRAME) {
@@ -248,6 +254,8 @@ if (!window.AFRAME) {
 
             this.camada = null;
 
+            this.removido = false;
+
 
             // ======================================
             // CANVAS TRANSPARENTE
@@ -271,22 +279,32 @@ if (!window.AFRAME) {
 
             this.ctx.imageSmoothingEnabled = true;
 
-            this.ctx.imageSmoothingQuality = "high";
+            this.ctx.imageSmoothingQuality = "medium";
 
 
-            // O plano original é utilizado apenas
-            // para calcular a posição inicial.
+            // O plano original serve apenas para
+            // calcular as dimensões da camada fixa.
 
             this.el.setAttribute(
                 "visible",
                 false
             );
 
+
+            // ======================================
+            // PRE-CARREGAMENTO IMEDIATO
+            // ======================================
+
+            this.preloadFrames(
+                1,
+                INITIAL_BUFFER
+            );
+
         },
 
 
         // ==========================================
-        // CARREGAR IMAGEM
+        // CARREGAR FRAME PNG
         // ==========================================
 
         loadFrame: function (number) {
@@ -294,12 +312,22 @@ if (!window.AFRAME) {
             if (
                 this.frames.has(number) ||
                 this.downloadsAtivos >= MAX_DOWNLOADS ||
-                window.arFalhou
+                window.arFalhou ||
+                this.removido
             ) return;
 
-            const image = new Image();
+
+            const image =
+                new Image();
 
             image.decoding = "async";
+
+            if (number === 1) {
+
+                image.fetchPriority = "high";
+
+            }
+
 
             const frame = {
 
@@ -313,7 +341,11 @@ if (!window.AFRAME) {
 
             };
 
-            this.frames.set(number, frame);
+
+            this.frames.set(
+                number,
+                frame
+            );
 
             this.downloadsAtivos++;
 
@@ -326,6 +358,10 @@ if (!window.AFRAME) {
 
                 frame.ready = true;
 
+
+                if (this.removido) return;
+
+
                 if (
                     !this.janelaPretendida.has(number)
                 ) {
@@ -333,6 +369,7 @@ if (!window.AFRAME) {
                     this.frames.delete(number);
 
                 }
+
 
                 verificarCarregamento();
 
@@ -349,10 +386,15 @@ if (!window.AFRAME) {
 
                 frame.failed = true;
 
+
                 console.warn(
                     "Frame indisponível:",
                     number
                 );
+
+
+                if (this.removido) return;
+
 
                 if (
                     number === 1 &&
@@ -367,6 +409,7 @@ if (!window.AFRAME) {
 
                 }
 
+
                 this.processarDownloads();
 
             };
@@ -379,12 +422,16 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // GESTÃO DOS DOWNLOADS
+        // DOWNLOADS SIMULTANEOS
         // ==========================================
 
         processarDownloads: function () {
 
-            if (window.arFalhou) return;
+            if (
+                window.arFalhou ||
+                this.removido
+            ) return;
+
 
             for (
                 const number of this.janelaPretendida
@@ -393,6 +440,7 @@ if (!window.AFRAME) {
                 if (
                     this.downloadsAtivos >= MAX_DOWNLOADS
                 ) break;
+
 
                 if (!this.frames.has(number)) {
 
@@ -406,7 +454,7 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // PRÉ-CARREGAMENTO
+        // PRE-CARREGAR OS PROXIMOS FRAMES
         // ==========================================
 
         preloadFrames: function (
@@ -415,6 +463,7 @@ if (!window.AFRAME) {
         ) {
 
             const manter = new Set();
+
 
             for (let i = 0; i < quantidade; i++) {
 
@@ -425,9 +474,11 @@ if (!window.AFRAME) {
 
             }
 
+
             manter.add(1);
 
-            this.janelaPretendida = manter;
+            this.janelaPretendida =
+                manter;
 
 
             for (
@@ -445,6 +496,7 @@ if (!window.AFRAME) {
 
             }
 
+
             this.processarDownloads();
 
         },
@@ -459,11 +511,8 @@ if (!window.AFRAME) {
             const frame =
                 this.frames.get(number);
 
-            if (!frame?.ready) {
+            if (!frame?.ready) return false;
 
-                return false;
-
-            }
 
             if (
                 this.ultimoFrameDesenhado === number
@@ -473,6 +522,7 @@ if (!window.AFRAME) {
 
             }
 
+
             this.ctx.clearRect(
 
                 0,
@@ -481,6 +531,7 @@ if (!window.AFRAME) {
                 CANVAS_HEIGHT
 
             );
+
 
             this.ctx.drawImage(
 
@@ -494,7 +545,9 @@ if (!window.AFRAME) {
 
             );
 
-            this.ultimoFrameDesenhado = number;
+
+            this.ultimoFrameDesenhado =
+                number;
 
             return true;
 
@@ -507,17 +560,15 @@ if (!window.AFRAME) {
 
         criarCamada: function (rect) {
 
-            if (this.camada) {
+            this.camada?.remove();
 
-                this.camada.remove();
-
-            }
 
             const camada =
                 document.createElement("div");
 
             camada.id =
-                "animacao-fixa-v24";
+                "animacao-fixa-v27";
+
 
             Object.assign(camada.style, {
 
@@ -583,7 +634,7 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // INICIAR ESTABILIZAÇÃO
+        // PREPARAR ESTABILIZACAO
         // ==========================================
 
         prepararBloqueio: function () {
@@ -594,6 +645,7 @@ if (!window.AFRAME) {
                 window.arFalhou
             ) return;
 
+
             this.aEstabilizar = true;
 
             this.amostras = [];
@@ -602,18 +654,19 @@ if (!window.AFRAME) {
 
             this.ultimoTempoAmostra = 0;
 
-            this.preloadFrames(1);
+
+            this.preloadFrames(
+                1,
+                BUFFER_SIZE
+            );
 
         },
 
 
-        // ==========================================
-        // CANCELAR ESTABILIZAÇÃO
-        // ==========================================
-
         cancelarBloqueio: function () {
 
             if (posicaoBloqueada) return;
+
 
             this.aEstabilizar = false;
 
@@ -625,7 +678,8 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // PROJETAR A ANIMAÇÃO NO ECRÃ
+        // CALCULAR POSICAO E DIMENSOES
+        // CALIBRACAO ORIGINAL DA V25
         // ==========================================
 
         calcularPosicao: function () {
@@ -642,6 +696,7 @@ if (!window.AFRAME) {
             const mesh =
                 this.el.getObject3D("mesh");
 
+
             if (
                 !camera ||
                 !mesh ||
@@ -657,14 +712,19 @@ if (!window.AFRAME) {
             const geometria =
                 mesh.geometry;
 
-            geometria.computeBoundingBox();
+
+            if (!geometria.boundingBox) {
+
+                geometria.computeBoundingBox();
+
+            }
+
 
             const caixa =
                 geometria.boundingBox;
 
 
             const centro =
-
                 caixa.getCenter(
                     new THREE.Vector3()
                 );
@@ -730,6 +790,7 @@ if (!window.AFRAME) {
 
                 ponto.project(camera);
 
+
                 return {
 
                     x:
@@ -749,40 +810,45 @@ if (!window.AFRAME) {
             }
 
 
-            const c = projetar(centro);
+            const c =
+                projetar(centro);
 
-            const e = projetar(esquerda);
+            const e =
+                projetar(esquerda);
 
-            const d = projetar(direita);
+            const d =
+                projetar(direita);
 
-            const s = projetar(superior);
+            const s =
+                projetar(superior);
 
-            const i = projetar(inferior);
-
-
-            const larguraProjetada = Math.hypot(
-
-                d.x - e.x,
-
-                d.y - e.y
-
-            );
+            const i =
+                projetar(inferior);
 
 
-            const alturaProjetada = Math.hypot(
+            const larguraProjetada =
+                Math.hypot(
 
-                i.x - s.x,
+                    d.x - e.x,
 
-                i.y - s.y
+                    d.y - e.y
 
-            );
+                );
+
+
+            const alturaProjetada =
+                Math.hypot(
+
+                    i.x - s.x,
+
+                    i.y - s.y
+
+                );
 
 
             const proporcao =
                 CANVAS_WIDTH / CANVAS_HEIGHT;
 
-
-            // Preservar as proporções originais.
 
             const largura =
                 Math.min(
@@ -793,18 +859,27 @@ if (!window.AFRAME) {
 
                 );
 
+
             const altura =
                 largura / proporcao;
 
 
             if (
+
                 !Number.isFinite(c.x) ||
+
                 !Number.isFinite(c.y) ||
+
                 !Number.isFinite(largura) ||
+
                 !Number.isFinite(altura) ||
+
                 largura < 10 ||
+
                 altura < 10 ||
+
                 largura > window.innerWidth * 5
+
             ) return null;
 
 
@@ -834,14 +909,19 @@ if (!window.AFRAME) {
                 !this.aEstabilizar
             ) return;
 
+
             if (
                 time - this.ultimoTempoAmostra < 40
             ) return;
 
-            this.ultimoTempoAmostra = time;
+
+            this.ultimoTempoAmostra =
+                time;
+
 
             const posicao =
                 this.calcularPosicao();
+
 
             if (!posicao) return;
 
@@ -850,7 +930,8 @@ if (!window.AFRAME) {
                 this.inicioEstabilizacao === null
             ) {
 
-                this.inicioEstabilizacao = time;
+                this.inicioEstabilizacao =
+                    time;
 
             }
 
@@ -867,12 +948,15 @@ if (!window.AFRAME) {
             }
 
 
+            const tempoDecorrido =
+                time - this.inicioEstabilizacao;
+
+
             if (
 
                 this.amostras.length >= MIN_AMOSTRAS &&
 
-                time - this.inicioEstabilizacao
-                    >= TEMPO_ESTABILIZACAO
+                tempoDecorrido >= TEMPO_ESTABILIZACAO
 
             ) {
 
@@ -884,15 +968,19 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // BLOQUEIO ABSOLUTO DA CAMADA 2D
+        // BLOQUEAR DEFINITIVAMENTE A POSICAO
         // ==========================================
 
         bloquearPosicao: function () {
 
             if (
+
                 posicaoBloqueada ||
+
                 !this.amostras.length ||
+
                 !this.frames.get(1)?.ready
+
             ) return;
 
 
@@ -908,11 +996,13 @@ if (!window.AFRAME) {
                         ordenados.length / 2
                     );
 
+
                 if (ordenados.length % 2) {
 
                     return ordenados[meio];
 
                 }
+
 
                 return (
 
@@ -973,13 +1063,12 @@ if (!window.AFRAME) {
             };
 
 
+            // Mostrar imediatamente o primeiro frame.
+
             this.drawFrame(1);
 
             this.criarCamada(rect);
 
-
-            // A partir deste momento,
-            // a posição deixa de depender do tracking.
 
             posicaoBloqueada = true;
 
@@ -993,18 +1082,13 @@ if (!window.AFRAME) {
 
 
             this.el.setAttribute(
-
                 "visible",
-
                 false
-
             );
 
 
             document.body.classList.add(
-
                 "alvo-encontrado"
-
             );
 
 
@@ -1012,9 +1096,36 @@ if (!window.AFRAME) {
                 "Selo reconhecido!";
 
 
+            // Medir o tempo de arranque.
+
+            if (instanteReconhecimento !== null) {
+
+                const segundos =
+
+                    (
+                        performance.now() -
+                        instanteReconhecimento
+                    ) / 1000;
+
+
+                window.tempoArranqueAR =
+                    segundos;
+
+
+                console.log(
+
+                    "V27 — Tempo de arranque:",
+
+                    segundos.toFixed(2) + " segundos"
+
+                );
+
+            }
+
+
             console.log(
 
-                "V24 — Animação 2D bloqueada:",
+                "V27 — Posição fixa:",
 
                 rect
 
@@ -1024,7 +1135,7 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // REPRODUÇÃO DA ANIMAÇÃO
+        // REPRODUZIR A ANIMACAO
         // ==========================================
 
         tick: function (time) {
@@ -1080,16 +1191,22 @@ if (!window.AFRAME) {
             const framePretendido =
 
                 Math.floor(
+
                     decorrido / FRAME_DURATION
+
                 ) % TOTAL_FRAMES + 1;
 
 
             if (
-                framePretendido !== this.ultimoFramePedido
+
+                framePretendido !==
+                this.ultimoFramePedido
+
             ) {
 
                 this.ultimoFramePedido =
                     framePretendido;
+
 
                 this.preloadFrames(
                     framePretendido
@@ -1098,14 +1215,25 @@ if (!window.AFRAME) {
             }
 
 
-            this.drawFrame(
-                framePretendido
-            );
+            // Desenhar apenas quando existe
+            // um novo frame disponível.
+
+            if (
+
+                framePretendido !==
+                this.ultimoFrameDesenhado
+
+            ) {
+
+                this.drawFrame(
+                    framePretendido
+                );
+
+            }
 
 
-            // IMPORTANTE:
-            // Não atualizar left, top, width,
-            // height ou transform nesta função.
+            // A posição, rotação e dimensões
+            // da camada nunca são atualizadas.
 
         },
 
@@ -1115,6 +1243,8 @@ if (!window.AFRAME) {
         // ==========================================
 
         remove: function () {
+
+            this.removido = true;
 
             this.playing = false;
 
@@ -1134,12 +1264,13 @@ if (!window.AFRAME) {
 
 
 // ==================================================
-// INICIALIZAÇÃO
+// INICIALIZACAO
 // ==================================================
 
 document.addEventListener("DOMContentLoaded", () => {
 
     if (!window.AFRAME) return;
+
 
     const scene =
         document.querySelector("a-scene");
@@ -1156,19 +1287,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const botao =
         $("iniciar-experiencia");
 
+
     const componente = () =>
+
         animacao.components["sequencia-envelope"];
 
 
 // ==================================================
-// BOTÃO INICIAR
+// BOTAO INICIAR EXPERIENCIA
 // ==================================================
 
     botao.addEventListener("click", async () => {
 
         if (
+
             experienciaIniciada ||
+
             window.arFalhou
+
         ) return;
 
 
@@ -1235,6 +1371,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const sistema =
                 scene.systems["mindar-image-system"];
 
+
             if (!sistema) {
 
                 throw new Error(
@@ -1243,6 +1380,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
 
+
+            // Iniciar a câmara sem esperar
+            // pelo carregamento dos frames.
 
             const arranque =
                 sistema.start();
@@ -1257,9 +1397,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            componente().preloadFrames(1, 4);
+            componente().preloadFrames(
+
+                1,
+
+                INITIAL_BUFFER
+
+            );
+
 
             verificarCarregamento();
+
 
             await arranque;
 
@@ -1267,6 +1415,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (erro) {
 
             console.error(erro);
+
 
             window.mostrarErroAR(
 
@@ -1284,7 +1433,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ==================================================
-// CÂMARA E MINDAR PREPARADOS
+// MINDAR PREPARADO
 // ==================================================
 
     scene.addEventListener("arReady", () => {
@@ -1313,13 +1462,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
         configurarFoco(scene);
 
+
+        // Continuar a carregar os próximos frames
+        // enquanto o utilizador procura o selo.
+
+        componente()?.preloadFrames(
+            1,
+            BUFFER_SIZE
+        );
+
+
         verificarCarregamento();
 
     });
 
 
 // ==================================================
-// RECONHECIMENTO DO SELO
+// SELO RECONHECIDO
 // ==================================================
 
     marcador.addEventListener("targetFound", () => {
@@ -1332,13 +1491,20 @@ document.addEventListener("DOMContentLoaded", () => {
         if (posicaoBloqueada) return;
 
 
+        instanteReconhecimento =
+            performance.now();
+
+
         estado.textContent =
-            "A estabilizar a experiência...";
+            "A preparar a animação...";
 
 
         if (
+
             carregamentoConcluido &&
+
             $("carregamento-ar").hidden
+
         ) {
 
             componente()?.prepararBloqueio();
@@ -1349,7 +1515,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ==================================================
-// PERDA DO TARGET
+// PERDA TEMPORARIA DO SELO
 // ==================================================
 
     marcador.addEventListener("targetLost", () => {
@@ -1357,8 +1523,8 @@ document.addEventListener("DOMContentLoaded", () => {
         marcadorEncontrado = false;
 
 
-        // A animação continua totalmente fixa,
-        // mesmo quando o selo deixa de ser visível.
+        // Após bloquear a posição, manter
+        // a animação completamente fixa.
 
         if (posicaoBloqueada) return;
 
@@ -1378,7 +1544,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ==================================================
-// ERRO DE INICIALIZAÇÃO
+// ERRO MINDAR
 // ==================================================
 
     scene.addEventListener("arError", () => {
@@ -1391,7 +1557,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ==================================================
-// PRÉ-CARREGAMENTO ANTES DO CLIQUE
+// PRE-CARREGAMENTO ANTES DO CLIQUE
 // ==================================================
 
     function prepararBotao() {
@@ -1408,7 +1574,13 @@ document.addEventListener("DOMContentLoaded", () => {
             "Iniciar experiência";
 
 
-        componente()?.preloadFrames(1, 4);
+        componente()?.preloadFrames(
+
+            1,
+
+            INITIAL_BUFFER
+
+        );
 
     }
 
@@ -1433,7 +1605,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ==================================================
-// LIBERTAR CÂMARA AO SAIR
+// LIBERTAR A CAMARA AO SAIR
 // ==================================================
 
     window.addEventListener("pagehide", () => {
