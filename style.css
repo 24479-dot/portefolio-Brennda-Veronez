@@ -264,7 +264,7 @@ main {
 
 /* ==============================================================
    SECÇÃO 02 — CARTA
-   ENVELOPE REDUZIDO E SELO AUMENTADO
+   ENVELOPE REDUZIDO E SELO AUMENTADO PARA MINDAR
    ============================================================== */
 
 .composicao-carta {
@@ -282,30 +282,44 @@ main {
     z-index: 2;
 }
 
+
+/* ENVELOPE */
+
 .envelope {
+    position: absolute;
+
     inset: 0;
 
     width: 100%;
     height: 100%;
 
     object-fit: contain;
+
+    z-index: 2;
 }
 
-.selo-carta {
+
+/* SELO DOURADO — TARGET MINDAR */
+
+.selo-carta,
+#selo-carta {
     position: absolute;
 
-    left: 47.7%;
-    top: 78%;
+    left: 50% !important;
+    top: 76% !important;
 
-    width: 22%;
-    height: auto;
+    width: 25% !important;
+    max-width: none !important;
 
-    transform: translate(-50%, -50%);
+    height: auto !important;
+
+    transform: translate(-50%, -50%) !important;
 
     object-fit: contain;
 
     z-index: 3;
 }
+
 
 .secao-carta > .camada-fundo {
     object-fit: fill;
@@ -610,6 +624,8 @@ main {
 
 @media (max-aspect-ratio: 6/5) {
 
+    /* MENU FIXO */
+
     .menu-fixo nav {
         gap: .35rem 1rem;
         flex-wrap: wrap;
@@ -619,6 +635,9 @@ main {
     .menu-fixo a {
         font-size: .7rem;
     }
+
+
+    /* REGRAS COMUNS */
 
     .secao-portfolio {
         height: 100svh;
@@ -647,15 +666,21 @@ main {
         left: 50%;
         top: 50%;
         width: 84%;
+
         transform: translate(-50%, -50%);
     }
 
-    .selo-carta {
-        left: 47.7%;
-        top: 78%;
-        width: 22%;
-        height: auto;
-        transform: translate(-50%, -50%);
+    .selo-carta,
+    #selo-carta {
+        left: 50% !important;
+        top: 76% !important;
+
+        width: 25% !important;
+        max-width: none !important;
+
+        height: auto !important;
+
+        transform: translate(-50%, -50%) !important;
     }
 
 
