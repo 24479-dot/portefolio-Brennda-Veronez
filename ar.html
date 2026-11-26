@@ -13,13 +13,21 @@
 
     <link rel="stylesheet" href="ar.css?v=15">
 
+    <link rel="stylesheet" href="camera.css?v=17">
+
     <!-- BIBLIOTECAS MINDAR -->
 
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
+    <!-- ANIMAÇÃO ORIGINAL -->
+
     <script defer src="ar.js?v=16"></script>
+
+    <!-- DIAGNÓSTICO DA CÂMARA -->
+
+    <script defer src="camera.js?v=17"></script>
 
 </head>
 
@@ -163,6 +171,175 @@
             </p>
 
         </div>
+
+
+        <!-- BOTÃO DE CONFIGURAÇÕES -->
+
+        <button id="camera-abrir"
+                type="button"
+                hidden>
+
+            Câmara
+
+        </button>
+
+
+        <!-- PAINEL DE DIAGNÓSTICO -->
+
+        <div id="camera-painel" hidden>
+
+            <div class="camera-cabecalho">
+
+                <h2>Configurações da câmara</h2>
+
+                <button id="camera-fechar"
+                        type="button"
+                        aria-label="Fechar configurações">
+
+                    ×
+
+                </button>
+
+            </div>
+
+
+            <!-- INFORMAÇÕES REAIS -->
+
+            <div class="camera-diagnostico">
+
+                <div>
+                    <span>Câmara</span>
+                    <strong id="diag-camera">---</strong>
+                </div>
+
+                <div>
+                    <span>Resolução</span>
+                    <strong id="diag-resolucao">---</strong>
+                </div>
+
+                <div>
+                    <span>FPS</span>
+                    <strong id="diag-fps">---</strong>
+                </div>
+
+                <div>
+                    <span>Focagem</span>
+                    <strong id="diag-foco">---</strong>
+                </div>
+
+                <div>
+                    <span>Exposição</span>
+                    <strong id="diag-exposicao">---</strong>
+                </div>
+
+                <div>
+                    <span>Zoom</span>
+                    <strong id="diag-zoom">---</strong>
+                </div>
+
+                <div>
+                    <span>Target</span>
+                    <strong id="diag-target">---</strong>
+                </div>
+
+            </div>
+
+
+            <!-- SELEÇÃO DA LENTE -->
+
+            <label for="camera-lista">
+                Selecionar câmara
+            </label>
+
+            <select id="camera-lista"></select>
+
+            <button id="camera-trocar"
+                    type="button">
+
+                Usar esta câmara
+
+            </button>
+
+
+            <!-- FOCAGEM -->
+
+            <button id="camera-foco"
+                    type="button">
+
+                Ativar foco contínuo
+
+            </button>
+
+            <label class="camera-checkbox">
+
+                <input id="camera-toque"
+                       type="checkbox">
+
+                Focar ao tocar no ecrã
+
+            </label>
+
+
+            <!-- EXPOSIÇÃO -->
+
+            <button id="camera-exposicao-auto"
+                    type="button">
+
+                Ativar exposição automática
+
+            </button>
+
+            <div class="camera-slider-titulo">
+
+                <label for="camera-exposicao">
+                    Exposição
+                </label>
+
+                <span id="valor-exposicao">0</span>
+
+            </div>
+
+            <input id="camera-exposicao"
+                   type="range"
+                   disabled>
+
+
+            <!-- ZOOM -->
+
+            <div class="camera-slider-titulo">
+
+                <label for="camera-zoom">
+                    Zoom
+                </label>
+
+                <span id="valor-zoom">1</span>
+
+            </div>
+
+            <input id="camera-zoom"
+                   type="range"
+                   disabled>
+
+
+            <!-- ATUALIZAR INFORMAÇÕES -->
+
+            <button id="camera-atualizar"
+                    type="button">
+
+                Atualizar diagnóstico
+
+            </button>
+
+            <p id="camera-mensagem"
+               aria-live="polite">
+
+                A consultar as capacidades da câmara...
+
+            </p>
+
+        </div>
+
+        <div id="camera-ponto" hidden></div>
 
     </div>
 
@@ -312,6 +489,20 @@
         window.addEventListener("error", event => {
 
             if (event.target?.tagName === "SCRIPT") {
+
+                // O diagnóstico é opcional.
+
+                if (
+                    event.target.src.includes("camera.js")
+                ) {
+
+                    console.warn(
+                        "Painel de diagnóstico indisponível."
+                    );
+
+                    return;
+
+                }
 
                 window.mostrarErroAR(
                     "Não foi possível carregar os recursos da experiência."

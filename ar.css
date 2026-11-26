@@ -1,400 +1,22 @@
 
 /* ==========================================
-   CONFIGURAÇÕES GERAIS
+   V17 — PAINEL DE CONTROLO DA CÂMARA
 ========================================== */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
-html,
-body {
-    width: 100%;
-    height: 100%;
+/* BOTÃO ABRIR CONFIGURAÇÕES */
 
-    overflow: hidden;
-
-    font-family: Georgia, serif;
-
-    background: transparent !important;
-}
-
-body {
-    position: relative;
-    isolation: isolate;
-}
-
-[hidden] {
-    display: none !important;
-}
-
-
-/* ==========================================
-   CÂMARA NATURAL — 100%
-========================================== */
-
-body > video {
-
-    position: absolute;
-
-    z-index: 0 !important;
-
-    display: block !important;
-
-    visibility: visible !important;
-
-    opacity: 1 !important;
-
-    filter: none !important;
-
-    backdrop-filter: none !important;
-
-    pointer-events: none !important;
-
-}
-
-
-/* ==========================================
-   CENA MINDAR
-========================================== */
-
-a-scene {
-
-    position: absolute !important;
-
-    inset: 0;
-
-    width: 100%;
-
-    height: 100%;
-
-    background: transparent !important;
-
-    z-index: 1 !important;
-
-}
-
-a-scene canvas {
-
-    background: transparent !important;
-
-}
-
-
-/* ==========================================
-   ECRÃS INICIAL, CARREGAMENTO E ERRO
-========================================== */
-
-.ecra {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 1000;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 25px;
-
-    overflow: auto;
-
-    background: radial-gradient(
-        ellipse at center,
-        #510d1b,
-        #23050c
-    );
-
-    color: #e8d3a3;
-
-}
-
-#erro-ar {
-
-    z-index: 1001;
-
-}
-
-.conteudo {
-
-    width: 100%;
-
-    max-width: 340px;
-
-    text-align: center;
-
-}
-
-.conteudo h1 {
-
-    font-size: 30px;
-
-    font-weight: normal;
-
-    margin-bottom: 24px;
-
-}
-
-.conteudo h2 {
-
-    font-size: 22px;
-
-    font-weight: normal;
-
-    margin-bottom: 24px;
-
-}
-
-.conteudo p {
-
-    font-size: 15px;
-
-    line-height: 1.6;
-
-    margin: 16px 0;
-
-    color: #d8c3a2;
-
-}
-
-.conteudo .nota {
-
-    font-size: 12px;
-
-}
-
-
-/* ==========================================
-   BOTÕES
-========================================== */
-
-.conteudo button {
-
-    width: 100%;
-
-    padding: 15px 20px;
-
-    margin: 24px 0 12px;
-
-    background: #510d1b;
-
-    color: #e8d3a3;
-
-    border: 1px solid #d6b478;
-
-    border-radius: 6px;
-
-    font-family: Georgia, serif;
-
-    font-size: 16px;
-
-    cursor: pointer;
-
-    touch-action: manipulation;
-
-}
-
-.conteudo button:disabled {
-
-    opacity: 0.5;
-
-    cursor: default;
-
-}
-
-.regresso {
-
-    display: inline-block;
-
-    margin-top: 12px;
-
-    color: #d8c3a2;
-
-    text-decoration: none;
-
-    font-size: 14px;
-
-}
-
-
-/* ==========================================
-   CÍRCULO DE CARREGAMENTO
-========================================== */
-
-.circulo-carregamento {
-
-    position: relative;
-
-    width: 135px;
-
-    height: 135px;
-
-    margin: 0 auto 30px;
-
-}
-
-.circulo-carregamento svg {
-
-    width: 100%;
-
-    height: 100%;
-
-    transform: rotate(-90deg);
-
-}
-
-.circulo-fundo {
-
-    fill: none;
-
-    stroke: rgba(232, 211, 163, 0.15);
-
-    stroke-width: 2;
-
-}
-
-#circulo-progresso {
-
-    fill: none;
-
-    stroke: #d6b478;
-
-    stroke-width: 2.5;
-
-    stroke-linecap: round;
-
-    stroke-dasharray: 326.7256;
-
-    stroke-dashoffset: 326.7256;
-
-    transition: stroke-dashoffset 0.3s ease;
-
-}
-
-#percentagem {
-
-    position: absolute;
-
-    top: 50%;
-
-    left: 50%;
-
-    transform: translate(-50%, -50%);
-
-    font-size: 28px;
-
-}
-
-
-/* ==========================================
-   BARRA DE CARREGAMENTO
-========================================== */
-
-.barra-carregamento {
-
-    width: 100%;
-
-    height: 3px;
-
-    background: rgba(232, 211, 163, 0.15);
-
-    border-radius: 10px;
-
-    overflow: hidden;
-
-}
-
-#barra-progresso {
-
-    width: 0;
-
-    height: 100%;
-
-    background: #d6b478;
-
-    border-radius: 10px;
-
-    transition: width 0.3s ease;
-
-}
-
-
-/* ==========================================
-   SÍMBOLO DE ERRO
-========================================== */
-
-.simbolo-erro {
-
-    width: 90px;
-
-    height: 90px;
-
-    margin: 0 auto 25px;
-
-    display: grid;
-
-    place-items: center;
-
-    border: 1.5px solid #d6b478;
-
-    border-radius: 50%;
-
-    color: #d6b478;
-
-    font-size: 50px;
-
-}
-
-
-/* ==========================================
-   INTERFACE DA REALIDADE AUMENTADA
-========================================== */
-
-#interface-ar {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 10;
-
-    pointer-events: none;
-
-    background: transparent !important;
-
-    backdrop-filter: none !important;
-
-}
-
-#interface-ar::before,
-#interface-ar::after {
-
-    display: none !important;
-
-}
-
-
-/* ==========================================
-   BOTÃO VOLTAR
-========================================== */
-
-.voltar {
+#camera-abrir {
 
     position: absolute;
 
     top: max(16px, env(safe-area-inset-top));
 
-    left: 16px;
+    right: 16px;
 
     padding: 10px 15px;
 
-    background: rgba(81, 12, 25, 0.90);
+    background: rgba(81, 12, 25, 0.95);
 
     color: #e8d3a3;
 
@@ -402,95 +24,324 @@ a-scene canvas {
 
     border-radius: 6px;
 
+    font-family: Georgia, serif;
+
     font-size: 13px;
 
-    text-decoration: none;
-
     pointer-events: auto;
+
+    cursor: pointer;
+
+    z-index: 20;
 
 }
 
 
 /* ==========================================
-   INSTRUÇÕES
+   PAINEL
 ========================================== */
 
-.instrucoes {
+#camera-painel {
 
     position: absolute;
 
-    left: 50%;
+    top: max(65px, calc(env(safe-area-inset-top) + 50px));
 
-    bottom: max(20px, env(safe-area-inset-bottom));
+    right: 16px;
 
-    transform: translateX(-50%);
+    width: min(340px, calc(100vw - 32px));
 
-    width: 88%;
+    max-height: calc(100dvh - 100px);
 
-    max-width: 360px;
+    padding: 18px;
 
-    padding: 15px 18px;
+    overflow-y: auto;
 
-    background: rgba(52, 7, 16, 0.85);
+    overscroll-behavior: contain;
+
+    background: rgba(35, 5, 12, 0.97);
+
+    color: #e8d3a3;
 
     border: 1px solid #c2a36b;
 
     border-radius: 8px;
 
-    text-align: center;
+    font-family: Georgia, serif;
 
-    color: #ead9b5;
+    pointer-events: auto;
 
-    transition: opacity 0.3s ease;
+    z-index: 21;
 
 }
 
-.instrucoes h1 {
 
-    font-size: 20px;
+/* ==========================================
+   CABEÇALHO
+========================================== */
+
+.camera-cabecalho {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 18px;
+
+}
+
+.camera-cabecalho h2 {
+
+    font-size: 18px;
 
     font-weight: normal;
 
-    margin-bottom: 8px;
+}
+
+#camera-fechar {
+
+    width: 30px !important;
+
+    min-width: 30px;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    height: 30px;
+
+    font-size: 23px !important;
 
 }
 
-.instrucoes p {
+
+/* ==========================================
+   DADOS DE DIAGNÓSTICO
+========================================== */
+
+.camera-diagnostico {
+
+    border-top: 1px solid rgba(194, 163, 107, 0.35);
+
+    border-bottom: 1px solid rgba(194, 163, 107, 0.35);
+
+    margin-bottom: 18px;
+
+    padding: 10px 0;
+
+}
+
+.camera-diagnostico > div {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    margin: 10px 0;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+}
+
+.camera-diagnostico span {
+
+    color: #bfa88d;
+
+}
+
+.camera-diagnostico strong {
+
+    text-align: right;
+
+    font-weight: normal;
+
+    max-width: 65%;
+
+    overflow-wrap: anywhere;
+
+}
+
+
+/* ==========================================
+   BOTÕES E SELEÇÃO
+========================================== */
+
+#camera-painel button,
+
+#camera-painel select {
+
+    width: 100%;
+
+    padding: 10px;
+
+    margin: 6px 0;
+
+    background: #510d1b;
+
+    color: #e8d3a3;
+
+    border: 1px solid #c2a36b;
+
+    border-radius: 5px;
+
+    font-family: Georgia, serif;
 
     font-size: 13px;
+
+    cursor: pointer;
+
+}
+
+#camera-painel button:disabled,
+
+#camera-painel select:disabled,
+
+#camera-painel input:disabled {
+
+    opacity: 0.4;
+
+    cursor: not-allowed;
+
+}
+
+#camera-painel label {
+
+    font-size: 13px;
+
+}
+
+
+/* ==========================================
+   CONTROLO DA FOCAGEM
+========================================== */
+
+.camera-checkbox {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin: 12px 0;
+
+    line-height: 1.4;
+
+}
+
+.camera-checkbox input {
+
+    accent-color: #d6b478;
+
+    width: 17px;
+
+    height: 17px;
+
+}
+
+
+/* ==========================================
+   SLIDERS DE EXPOSIÇÃO E ZOOM
+========================================== */
+
+.camera-slider-titulo {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: 16px;
+
+    font-size: 13px;
+
+}
+
+#camera-painel input[type="range"] {
+
+    width: 100%;
+
+    margin: 12px 0;
+
+    accent-color: #d6b478;
+
+    cursor: pointer;
+
+}
+
+#valor-exposicao,
+
+#valor-zoom {
+
+    font-size: 11px;
+
+    color: #cbb69c;
+
+}
+
+
+/* ==========================================
+   MENSAGEM DE DIAGNÓSTICO
+========================================== */
+
+#camera-mensagem {
+
+    margin-top: 12px;
+
+    color: #cbb69c;
+
+    font-size: 12px;
 
     line-height: 1.5;
 
 }
 
-body.alvo-encontrado .instrucoes {
-
-    opacity: 0;
-
-}
-
 
 /* ==========================================
-   ECRÃ INTEIRO
+   INDICADOR DE FOCAGEM
 ========================================== */
 
-.a-enter-vr,
-.a-enter-ar,
-.a-enter-vr-button,
-.a-enter-ar-button {
+#camera-ponto {
 
-    display: none !important;
+    position: fixed;
+
+    width: 65px;
+
+    height: 65px;
+
+    border: 1.5px solid #e8d3a3;
+
+    border-radius: 5px;
+
+    transform: translate(-50%, -50%);
+
+    pointer-events: none;
+
+    z-index: 22;
 
 }
 
 
 /* ==========================================
-   OTIMIZAÇÃO PARA TELEMÓVEL
+   ADAPTAÇÃO AO TELEMÓVEL
 ========================================== */
 
 @media (max-width: 600px) {
 
-    .voltar {
+    #camera-abrir {
 
         font-size: 12px;
 
@@ -498,39 +349,17 @@ body.alvo-encontrado .instrucoes {
 
     }
 
-    .instrucoes {
+    #camera-painel {
 
-        padding: 12px 15px;
+        padding: 15px;
 
-    }
-
-    .instrucoes h1 {
-
-        font-size: 18px;
+        width: min(320px, calc(100vw - 32px));
 
     }
 
-    .instrucoes p {
+    .camera-cabecalho h2 {
 
-        font-size: 12px;
-
-    }
-
-    .conteudo h1 {
-
-        font-size: 27px;
-
-    }
-
-    .conteudo h2 {
-
-        font-size: 20px;
-
-    }
-
-    .conteudo p {
-
-        font-size: 14px;
+        font-size: 16px;
 
     }
 
