@@ -14,12 +14,12 @@
 
     <!-- FICHEIROS CSS -->
 
-    <link rel="stylesheet" href="./ar.css?v=20">
+    <link rel="stylesheet" href="./ar.css?v=21">
 
-    <link rel="stylesheet" href="./camara.css?v=20">
+    <link rel="stylesheet" href="./camara.css?v=21">
 
 
-    <!-- BIBLIOTECAS MINDAR -->
+    <!-- BIBLIOTECAS -->
 
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
@@ -359,8 +359,8 @@
 
 
     <!-- ======================================
-         CENA MINDAR
-         TARGET 1 — SELO DOURADO
+         MINDAR V21
+         ESTABILIZAÇÃO DO TRACKING
     ======================================= -->
 
     <a-scene
@@ -369,10 +369,13 @@
             imageTargetSrc: ./targets%20(1).mind;
             autoStart: false;
             maxTrack: 1;
-            filterMinCF: 0.001;
-            filterBeta: 1000;
-            warmupTolerance: 1;
+
+            filterMinCF: 0.0001;
+            filterBeta: 10;
+
+            warmupTolerance: 5;
             missTolerance: 20;
+
             uiLoading: no;
             uiScanning: no;
             uiError: no;
@@ -406,7 +409,7 @@
         </a-camera>
 
 
-        <!-- TARGET DO SELO -->
+        <!-- TARGET DO SELO DOURADO -->
 
         <a-entity
 
@@ -415,7 +418,7 @@
             mindar-image-target="targetIndex: 0">
 
 
-            <!-- ANIMAÇÃO AJUSTADA AO SELO MAIOR -->
+            <!-- ANIMAÇÃO DO ENVELOPE -->
 
             <a-plane
 
@@ -576,7 +579,6 @@
 
 
         // ATUALIZAR INSTRUÇÕES PARA O SELO
-        // SEM ALTERAR O JAVASCRIPT ORIGINAL
 
         const estadoAR =
             document.getElementById("estado");
@@ -628,9 +630,7 @@
         observador.observe(estadoAR, {
 
             childList: true,
-
             characterData: true,
-
             subtree: true
 
         });
@@ -639,9 +639,7 @@
         observador.observe(estadoTarget, {
 
             childList: true,
-
             characterData: true,
-
             subtree: true
 
         });
