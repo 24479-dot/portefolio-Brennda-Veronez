@@ -1,0 +1,367 @@
+
+/* ==========================================
+   V17 — PAINEL DE CONTROLO DA CÂMARA
+========================================== */
+
+
+/* BOTÃO ABRIR CONFIGURAÇÕES */
+
+#camera-abrir {
+
+    position: absolute;
+
+    top: max(16px, env(safe-area-inset-top));
+
+    right: 16px;
+
+    padding: 10px 15px;
+
+    background: rgba(81, 12, 25, 0.95);
+
+    color: #e8d3a3;
+
+    border: 1px solid #c2a36b;
+
+    border-radius: 6px;
+
+    font-family: Georgia, serif;
+
+    font-size: 13px;
+
+    pointer-events: auto;
+
+    cursor: pointer;
+
+    z-index: 20;
+
+}
+
+
+/* ==========================================
+   PAINEL
+========================================== */
+
+#camera-painel {
+
+    position: absolute;
+
+    top: max(65px, calc(env(safe-area-inset-top) + 50px));
+
+    right: 16px;
+
+    width: min(340px, calc(100vw - 32px));
+
+    max-height: calc(100dvh - 100px);
+
+    padding: 18px;
+
+    overflow-y: auto;
+
+    overscroll-behavior: contain;
+
+    background: rgba(35, 5, 12, 0.97);
+
+    color: #e8d3a3;
+
+    border: 1px solid #c2a36b;
+
+    border-radius: 8px;
+
+    font-family: Georgia, serif;
+
+    pointer-events: auto;
+
+    z-index: 21;
+
+}
+
+
+/* ==========================================
+   CABEÇALHO
+========================================== */
+
+.camera-cabecalho {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 18px;
+
+}
+
+.camera-cabecalho h2 {
+
+    font-size: 18px;
+
+    font-weight: normal;
+
+}
+
+#camera-fechar {
+
+    width: 30px !important;
+
+    min-width: 30px;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    height: 30px;
+
+    font-size: 23px !important;
+
+}
+
+
+/* ==========================================
+   DADOS DE DIAGNÓSTICO
+========================================== */
+
+.camera-diagnostico {
+
+    border-top: 1px solid rgba(194, 163, 107, 0.35);
+
+    border-bottom: 1px solid rgba(194, 163, 107, 0.35);
+
+    margin-bottom: 18px;
+
+    padding: 10px 0;
+
+}
+
+.camera-diagnostico > div {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    margin: 10px 0;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+}
+
+.camera-diagnostico span {
+
+    color: #bfa88d;
+
+}
+
+.camera-diagnostico strong {
+
+    text-align: right;
+
+    font-weight: normal;
+
+    max-width: 65%;
+
+    overflow-wrap: anywhere;
+
+}
+
+
+/* ==========================================
+   BOTÕES E SELEÇÃO
+========================================== */
+
+#camera-painel button,
+
+#camera-painel select {
+
+    width: 100%;
+
+    padding: 10px;
+
+    margin: 6px 0;
+
+    background: #510d1b;
+
+    color: #e8d3a3;
+
+    border: 1px solid #c2a36b;
+
+    border-radius: 5px;
+
+    font-family: Georgia, serif;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+}
+
+#camera-painel button:disabled,
+
+#camera-painel select:disabled,
+
+#camera-painel input:disabled {
+
+    opacity: 0.4;
+
+    cursor: not-allowed;
+
+}
+
+#camera-painel label {
+
+    font-size: 13px;
+
+}
+
+
+/* ==========================================
+   CONTROLO DA FOCAGEM
+========================================== */
+
+.camera-checkbox {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin: 12px 0;
+
+    line-height: 1.4;
+
+}
+
+.camera-checkbox input {
+
+    accent-color: #d6b478;
+
+    width: 17px;
+
+    height: 17px;
+
+}
+
+
+/* ==========================================
+   SLIDERS DE EXPOSIÇÃO E ZOOM
+========================================== */
+
+.camera-slider-titulo {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: 16px;
+
+    font-size: 13px;
+
+}
+
+#camera-painel input[type="range"] {
+
+    width: 100%;
+
+    margin: 12px 0;
+
+    accent-color: #d6b478;
+
+    cursor: pointer;
+
+}
+
+#valor-exposicao,
+
+#valor-zoom {
+
+    font-size: 11px;
+
+    color: #cbb69c;
+
+}
+
+
+/* ==========================================
+   MENSAGEM DE DIAGNÓSTICO
+========================================== */
+
+#camera-mensagem {
+
+    margin-top: 12px;
+
+    color: #cbb69c;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+
+}
+
+
+/* ==========================================
+   INDICADOR DE FOCAGEM
+========================================== */
+
+#camera-ponto {
+
+    position: fixed;
+
+    width: 65px;
+
+    height: 65px;
+
+    border: 1.5px solid #e8d3a3;
+
+    border-radius: 5px;
+
+    transform: translate(-50%, -50%);
+
+    pointer-events: none;
+
+    z-index: 22;
+
+}
+
+
+/* ==========================================
+   ADAPTAÇÃO AO TELEMÓVEL
+========================================== */
+
+@media (max-width: 600px) {
+
+    #camera-abrir {
+
+        font-size: 12px;
+
+        padding: 9px 12px;
+
+    }
+
+    #camera-painel {
+
+        padding: 15px;
+
+        width: min(320px, calc(100vw - 32px));
+
+    }
+
+    .camera-cabecalho h2 {
+
+        font-size: 16px;
+
+    }
+
+}
+
