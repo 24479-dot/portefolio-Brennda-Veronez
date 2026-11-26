@@ -1,11 +1,10 @@
 
-// ==================================================
-// V27 — MINDAR
-// ARRANQUE RAPIDO COM PNG ORIGINAIS
-// POSICAO 2D FIXA E CALIBRACAO V25
-// ==================================================
-
 "use strict";
+
+// ==================================================
+// V29 — MINDAR
+// CENTRALIZAÇÃO E ENQUADRAMENTO AUTOMÁTICO
+// ==================================================
 
 const TOTAL_FRAMES = 220;
 const FPS = 25;
@@ -22,6 +21,14 @@ const MAX_DOWNLOADS = 6;
 
 const TEMPO_ESTABILIZACAO = 300;
 const MIN_AMOSTRAS = 5;
+
+// ==================================================
+// CONFIGURAÇÃO DO ENQUADRAMENTO
+// ==================================================
+
+const MARGEM_LATERAL = 0.05;
+const MARGEM_SUPERIOR = 0.12;
+const MARGEM_INFERIOR = 0.05;
 
 let cameraPreparada = false;
 let experienciaIniciada = false;
@@ -98,17 +105,12 @@ function verificarCarregamento() {
 
     );
 
-
-    // Não esperar pelo carregamento completo
-    // dos primeiros 12 frames.
-
     if (
         cameraPreparada &&
         componente.frames.get(1)?.ready
     ) {
 
         carregamentoConcluido = true;
-
         window.arPronto = true;
 
         clearTimeout(window.limiteAR);
@@ -118,9 +120,7 @@ function verificarCarregamento() {
             "Experiência preparada!"
         );
 
-
         $("carregamento-ar").hidden = true;
-
 
         if (marcadorEncontrado) {
 
@@ -148,7 +148,7 @@ function framePath(number) {
 
 
 // ==================================================
-// CONFIGURACAO DA CAMARA
+// CONFIGURAÇÃO DA CÂMARA
 // ==================================================
 
 async function configurarFoco(scene) {
@@ -169,7 +169,6 @@ async function configurarFoco(scene) {
 
         const capacidades =
             track.getCapabilities?.() || {};
-
 
         if (
             capacidades.focusMode?.includes("continuous")
@@ -196,9 +195,8 @@ async function configurarFoco(scene) {
 
         }
 
-
         console.log(
-            "V27 — Câmara:",
+            "V29 — Câmara:",
             track.getSettings()
         );
 
@@ -215,7 +213,134 @@ async function configurarFoco(scene) {
 
 
 // ==================================================
-// COMPONENTE DA ANIMACAO
+// ENQUADRAMENTO AUTOMÁTICO
+// ==================================================
+
+function ajustarEnquadramento(larguraOriginal) {
+
+    const viewport = window.visualViewport;
+
+    const larguraEcra =
+        viewport?.width || window.innerWidth;
+
+    const alturaEcra =
+        viewport?.height || window.innerHeight;
+
+    const offsetX =
+        viewport?.offsetLeft || 0;
+
+    const offsetY =
+        viewport?.offsetTop || 0;
+
+    const proporcao =
+        CANVAS_WIDTH / CANVAS_HEIGHT;
+
+
+    // Margens de segurança.
+
+    const margemX =
+        larguraEcra * MARGEM_LATERAL;
+
+    let margemTopo =
+        alturaEcra * MARGEM_SUPERIOR;
+
+    const margemFundo =
+        alturaEcra * MARGEM_INFERIOR;
+
+
+    // Evitar sobreposição com os botões superiores.
+
+    const botaoVoltar =
+        document.querySelector(".voltar");
+
+    const botaoCamera =
+        $("camera-abrir");
+
+    for (const botao of [botaoVoltar, botaoCamera]) {
+
+        if (!botao || botao.hidden) continue;
+
+        const rect =
+            botao.getBoundingClientRect();
+
+        margemTopo = Math.max(
+
+            margemTopo,
+
+            rect.bottom - offsetY + 12
+
+        );
+
+    }
+
+
+    // Área disponível para toda a animação.
+
+    const larguraDisponivel =
+        Math.max(1, larguraEcra - margemX * 2);
+
+    const alturaDisponivel =
+        Math.max(
+
+            1,
+
+            alturaEcra -
+            margemTopo -
+            margemFundo
+
+        );
+
+
+    // Reduzir apenas quando necessário.
+    // Preservar sempre a proporção original.
+
+    const larguraFinal =
+        Math.min(
+
+            larguraOriginal,
+
+            larguraDisponivel,
+
+            alturaDisponivel * proporcao
+
+        );
+
+    const alturaFinal =
+        larguraFinal / proporcao;
+
+
+    // Centralização horizontal.
+
+    const esquerda =
+        offsetX +
+        (larguraEcra - larguraFinal) / 2;
+
+
+    // Centralização vertical dentro da área útil.
+
+    const topo =
+        offsetY +
+        margemTopo +
+        (alturaDisponivel - alturaFinal) / 2;
+
+
+    return {
+
+        left: esquerda,
+
+        top: topo,
+
+        width: larguraFinal,
+
+        height: alturaFinal
+
+    };
+
+}
+
+
+// ==================================================
+// COMPONENTE DA ANIMAÇÃO
 // ==================================================
 
 if (!window.AFRAME) {
@@ -257,9 +382,7 @@ if (!window.AFRAME) {
             this.removido = false;
 
 
-            // ======================================
-            // CANVAS TRANSPARENTE
-            // ======================================
+            // Canvas transparente.
 
             this.canvas =
                 document.createElement("canvas");
@@ -282,18 +405,13 @@ if (!window.AFRAME) {
             this.ctx.imageSmoothingQuality = "medium";
 
 
-            // O plano original serve apenas para
-            // calcular as dimensões da camada fixa.
-
             this.el.setAttribute(
                 "visible",
                 false
             );
 
 
-            // ======================================
-            // PRE-CARREGAMENTO IMEDIATO
-            // ======================================
+            // Pré-carregamento imediato.
 
             this.preloadFrames(
                 1,
@@ -304,7 +422,7 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // CARREGAR FRAME PNG
+        // CARREGAR FRAME
         // ==========================================
 
         loadFrame: function (number) {
@@ -316,9 +434,7 @@ if (!window.AFRAME) {
                 this.removido
             ) return;
 
-
-            const image =
-                new Image();
+            const image = new Image();
 
             image.decoding = "async";
 
@@ -327,7 +443,6 @@ if (!window.AFRAME) {
                 image.fetchPriority = "high";
 
             }
-
 
             const frame = {
 
@@ -341,11 +456,7 @@ if (!window.AFRAME) {
 
             };
 
-
-            this.frames.set(
-                number,
-                frame
-            );
+            this.frames.set(number, frame);
 
             this.downloadsAtivos++;
 
@@ -358,9 +469,7 @@ if (!window.AFRAME) {
 
                 frame.ready = true;
 
-
                 if (this.removido) return;
-
 
                 if (
                     !this.janelaPretendida.has(number)
@@ -369,7 +478,6 @@ if (!window.AFRAME) {
                     this.frames.delete(number);
 
                 }
-
 
                 verificarCarregamento();
 
@@ -386,15 +494,12 @@ if (!window.AFRAME) {
 
                 frame.failed = true;
 
+                if (this.removido) return;
 
                 console.warn(
                     "Frame indisponível:",
                     number
                 );
-
-
-                if (this.removido) return;
-
 
                 if (
                     number === 1 &&
@@ -409,20 +514,18 @@ if (!window.AFRAME) {
 
                 }
 
-
                 this.processarDownloads();
 
             };
 
 
-            image.src =
-                framePath(number);
+            image.src = framePath(number);
 
         },
 
 
         // ==========================================
-        // DOWNLOADS SIMULTANEOS
+        // DOWNLOADS SIMULTÂNEOS
         // ==========================================
 
         processarDownloads: function () {
@@ -432,7 +535,6 @@ if (!window.AFRAME) {
                 this.removido
             ) return;
 
-
             for (
                 const number of this.janelaPretendida
             ) {
@@ -440,7 +542,6 @@ if (!window.AFRAME) {
                 if (
                     this.downloadsAtivos >= MAX_DOWNLOADS
                 ) break;
-
 
                 if (!this.frames.has(number)) {
 
@@ -454,7 +555,7 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // PRE-CARREGAR OS PROXIMOS FRAMES
+        // PRÉ-CARREGAMENTO
         // ==========================================
 
         preloadFrames: function (
@@ -463,7 +564,6 @@ if (!window.AFRAME) {
         ) {
 
             const manter = new Set();
-
 
             for (let i = 0; i < quantidade; i++) {
 
@@ -474,12 +574,9 @@ if (!window.AFRAME) {
 
             }
 
-
             manter.add(1);
 
-            this.janelaPretendida =
-                manter;
-
+            this.janelaPretendida = manter;
 
             for (
                 const [number, frame] of this.frames
@@ -495,7 +592,6 @@ if (!window.AFRAME) {
                 }
 
             }
-
 
             this.processarDownloads();
 
@@ -513,7 +609,6 @@ if (!window.AFRAME) {
 
             if (!frame?.ready) return false;
 
-
             if (
                 this.ultimoFrameDesenhado === number
             ) {
@@ -521,7 +616,6 @@ if (!window.AFRAME) {
                 return true;
 
             }
-
 
             this.ctx.clearRect(
 
@@ -531,7 +625,6 @@ if (!window.AFRAME) {
                 CANVAS_HEIGHT
 
             );
-
 
             this.ctx.drawImage(
 
@@ -545,9 +638,7 @@ if (!window.AFRAME) {
 
             );
 
-
-            this.ultimoFrameDesenhado =
-                number;
+            this.ultimoFrameDesenhado = number;
 
             return true;
 
@@ -555,20 +646,18 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // CRIAR CAMADA 2D FIXA
+        // CRIAR CAMADA FIXA E CENTRALIZADA
         // ==========================================
 
         criarCamada: function (rect) {
 
             this.camada?.remove();
 
-
             const camada =
                 document.createElement("div");
 
             camada.id =
-                "animacao-fixa-v27";
-
+                "animacao-fixa-v29";
 
             Object.assign(camada.style, {
 
@@ -602,7 +691,9 @@ if (!window.AFRAME) {
 
                 margin: "0",
 
-                padding: "0"
+                padding: "0",
+
+                boxSizing: "border-box"
 
             });
 
@@ -614,6 +705,12 @@ if (!window.AFRAME) {
                 width: "100%",
 
                 height: "100%",
+
+                maxWidth: "100%",
+
+                maxHeight: "100%",
+
+                objectFit: "contain",
 
                 background: "transparent",
 
@@ -634,7 +731,7 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // PREPARAR ESTABILIZACAO
+        // PREPARAR ESTABILIZAÇÃO
         // ==========================================
 
         prepararBloqueio: function () {
@@ -645,7 +742,6 @@ if (!window.AFRAME) {
                 window.arFalhou
             ) return;
 
-
             this.aEstabilizar = true;
 
             this.amostras = [];
@@ -653,7 +749,6 @@ if (!window.AFRAME) {
             this.inicioEstabilizacao = null;
 
             this.ultimoTempoAmostra = 0;
-
 
             this.preloadFrames(
                 1,
@@ -667,7 +762,6 @@ if (!window.AFRAME) {
 
             if (posicaoBloqueada) return;
 
-
             this.aEstabilizar = false;
 
             this.amostras = [];
@@ -678,8 +772,7 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // CALCULAR POSICAO E DIMENSOES
-        // CALIBRACAO ORIGINAL DA V25
+        // CALCULAR DIMENSÕES ATRAVÉS DO MINDAR
         // ==========================================
 
         calcularPosicao: function () {
@@ -696,7 +789,6 @@ if (!window.AFRAME) {
             const mesh =
                 this.el.getObject3D("mesh");
 
-
             if (
                 !camera ||
                 !mesh ||
@@ -708,10 +800,8 @@ if (!window.AFRAME) {
 
             mesh.updateWorldMatrix(true, false);
 
-
             const geometria =
                 mesh.geometry;
-
 
             if (!geometria.boundingBox) {
 
@@ -719,64 +809,49 @@ if (!window.AFRAME) {
 
             }
 
-
             const caixa =
                 geometria.boundingBox;
-
 
             const centro =
                 caixa.getCenter(
                     new THREE.Vector3()
                 );
 
-
             const esquerda =
                 new THREE.Vector3(
 
                     caixa.min.x,
-
                     centro.y,
-
                     centro.z
 
                 );
-
 
             const direita =
                 new THREE.Vector3(
 
                     caixa.max.x,
-
                     centro.y,
-
                     centro.z
 
                 );
-
 
             const superior =
                 new THREE.Vector3(
 
                     centro.x,
-
                     caixa.max.y,
-
                     centro.z
 
                 );
-
 
             const inferior =
                 new THREE.Vector3(
 
                     centro.x,
-
                     caixa.min.y,
-
                     centro.z
 
                 );
-
 
             const canvasRect =
                 scene.canvas.getBoundingClientRect();
@@ -789,7 +864,6 @@ if (!window.AFRAME) {
                 );
 
                 ponto.project(camera);
-
 
                 return {
 
@@ -810,20 +884,15 @@ if (!window.AFRAME) {
             }
 
 
-            const c =
-                projetar(centro);
+            const c = projetar(centro);
 
-            const e =
-                projetar(esquerda);
+            const e = projetar(esquerda);
 
-            const d =
-                projetar(direita);
+            const d = projetar(direita);
 
-            const s =
-                projetar(superior);
+            const s = projetar(superior);
 
-            const i =
-                projetar(inferior);
+            const i = projetar(inferior);
 
 
             const larguraProjetada =
@@ -849,7 +918,6 @@ if (!window.AFRAME) {
             const proporcao =
                 CANVAS_WIDTH / CANVAS_HEIGHT;
 
-
             const largura =
                 Math.min(
 
@@ -858,7 +926,6 @@ if (!window.AFRAME) {
                     alturaProjetada * proporcao
 
                 );
-
 
             const altura =
                 largura / proporcao;
@@ -899,7 +966,7 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // RECOLHER AMOSTRAS DO MINDAR
+        // RECOLHER AMOSTRAS
         // ==========================================
 
         recolherPosicao: function (time) {
@@ -909,35 +976,26 @@ if (!window.AFRAME) {
                 !this.aEstabilizar
             ) return;
 
-
             if (
                 time - this.ultimoTempoAmostra < 40
             ) return;
 
-
-            this.ultimoTempoAmostra =
-                time;
-
+            this.ultimoTempoAmostra = time;
 
             const posicao =
                 this.calcularPosicao();
 
-
             if (!posicao) return;
-
 
             if (
                 this.inicioEstabilizacao === null
             ) {
 
-                this.inicioEstabilizacao =
-                    time;
+                this.inicioEstabilizacao = time;
 
             }
 
-
             this.amostras.push(posicao);
-
 
             if (
                 this.amostras.length > 12
@@ -947,16 +1005,12 @@ if (!window.AFRAME) {
 
             }
 
-
-            const tempoDecorrido =
-                time - this.inicioEstabilizacao;
-
-
             if (
 
                 this.amostras.length >= MIN_AMOSTRAS &&
 
-                tempoDecorrido >= TEMPO_ESTABILIZACAO
+                time - this.inicioEstabilizacao
+                    >= TEMPO_ESTABILIZACAO
 
             ) {
 
@@ -968,7 +1022,7 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // BLOQUEAR DEFINITIVAMENTE A POSICAO
+        // CENTRALIZAR E BLOQUEAR A ANIMAÇÃO
         // ==========================================
 
         bloquearPosicao: function () {
@@ -996,13 +1050,11 @@ if (!window.AFRAME) {
                         ordenados.length / 2
                     );
 
-
                 if (ordenados.length % 2) {
 
                     return ordenados[meio];
 
                 }
-
 
                 return (
 
@@ -1015,7 +1067,9 @@ if (!window.AFRAME) {
             }
 
 
-            const largura =
+            // Calcular a escala reconhecida pelo MindAR.
+
+            const larguraOriginal =
                 mediana(
 
                     this.amostras.map(
@@ -1025,50 +1079,22 @@ if (!window.AFRAME) {
                 );
 
 
-            const altura =
-                largura /
-                (CANVAS_WIDTH / CANVAS_HEIGHT);
+            // Ajustar automaticamente ao ecrã.
+            // Nenhuma parte do canvas ficará fora
+            // da área de segurança inicial.
 
-
-            const centroX =
-                mediana(
-
-                    this.amostras.map(
-                        a => a.centerX
-                    )
-
+            const rect =
+                ajustarEnquadramento(
+                    larguraOriginal
                 );
 
-
-            const centroY =
-                mediana(
-
-                    this.amostras.map(
-                        a => a.centerY
-                    )
-
-                );
-
-
-            const rect = {
-
-                left: centroX - largura / 2,
-
-                top: centroY - altura / 2,
-
-                width: largura,
-
-                height: altura
-
-            };
-
-
-            // Mostrar imediatamente o primeiro frame.
 
             this.drawFrame(1);
 
             this.criarCamada(rect);
 
+
+            // Bloquear definitivamente.
 
             posicaoBloqueada = true;
 
@@ -1080,23 +1106,18 @@ if (!window.AFRAME) {
 
             this.ultimoFramePedido = null;
 
-
             this.el.setAttribute(
                 "visible",
                 false
             );
 
-
             document.body.classList.add(
                 "alvo-encontrado"
             );
 
-
             $("estado").textContent =
                 "Selo reconhecido!";
 
-
-            // Medir o tempo de arranque.
 
             if (instanteReconhecimento !== null) {
 
@@ -1107,14 +1128,12 @@ if (!window.AFRAME) {
                         instanteReconhecimento
                     ) / 1000;
 
-
                 window.tempoArranqueAR =
                     segundos;
 
-
                 console.log(
 
-                    "V27 — Tempo de arranque:",
+                    "V29 — Tempo de arranque:",
 
                     segundos.toFixed(2) + " segundos"
 
@@ -1125,7 +1144,7 @@ if (!window.AFRAME) {
 
             console.log(
 
-                "V27 — Posição fixa:",
+                "V29 — Enquadramento final:",
 
                 rect
 
@@ -1135,7 +1154,7 @@ if (!window.AFRAME) {
 
 
         // ==========================================
-        // REPRODUZIR A ANIMACAO
+        // REPRODUÇÃO A 25 FPS
         // ==========================================
 
         tick: function (time) {
@@ -1152,7 +1171,6 @@ if (!window.AFRAME) {
 
             }
 
-
             if (
 
                 this.aEstabilizar &&
@@ -1164,7 +1182,6 @@ if (!window.AFRAME) {
                 this.recolherPosicao(time);
 
             }
-
 
             if (
 
@@ -1183,10 +1200,8 @@ if (!window.AFRAME) {
 
             }
 
-
             const decorrido =
                 time - this.tempoInicial;
-
 
             const framePretendido =
 
@@ -1207,16 +1222,12 @@ if (!window.AFRAME) {
                 this.ultimoFramePedido =
                     framePretendido;
 
-
                 this.preloadFrames(
                     framePretendido
                 );
 
             }
 
-
-            // Desenhar apenas quando existe
-            // um novo frame disponível.
 
             if (
 
@@ -1232,8 +1243,8 @@ if (!window.AFRAME) {
             }
 
 
-            // A posição, rotação e dimensões
-            // da camada nunca são atualizadas.
+            // Não atualizar posição, rotação ou escala.
+            // A animação permanece fixa no ecrã.
 
         },
 
@@ -1264,13 +1275,12 @@ if (!window.AFRAME) {
 
 
 // ==================================================
-// INICIALIZACAO
+// INICIALIZAÇÃO
 // ==================================================
 
 document.addEventListener("DOMContentLoaded", () => {
 
     if (!window.AFRAME) return;
-
 
     const scene =
         document.querySelector("a-scene");
@@ -1287,26 +1297,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const botao =
         $("iniciar-experiencia");
 
-
     const componente = () =>
 
         animacao.components["sequencia-envelope"];
 
 
 // ==================================================
-// BOTAO INICIAR EXPERIENCIA
+// BOTÃO INICIAR
 // ==================================================
 
     botao.addEventListener("click", async () => {
 
         if (
-
             experienciaIniciada ||
-
             window.arFalhou
-
         ) return;
-
 
         if (!window.isSecureContext) {
 
@@ -1317,7 +1322,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
 
         }
-
 
         if (
             !navigator.mediaDevices?.getUserMedia
@@ -1331,7 +1335,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
-
         experienciaIniciada = true;
 
         botao.disabled = true;
@@ -1339,7 +1342,6 @@ document.addEventListener("DOMContentLoaded", () => {
         $("inicio-ar").hidden = true;
 
         $("carregamento-ar").hidden = false;
-
 
         atualizarProgresso(
 
@@ -1349,9 +1351,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         );
 
-
         clearTimeout(window.limiteAR);
-
 
         window.limiteAR = setTimeout(() => {
 
@@ -1371,7 +1371,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const sistema =
                 scene.systems["mindar-image-system"];
 
-
             if (!sistema) {
 
                 throw new Error(
@@ -1380,13 +1379,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
 
-
-            // Iniciar a câmara sem esperar
-            // pelo carregamento dos frames.
-
             const arranque =
                 sistema.start();
-
 
             if (
                 componente().frames.get(1)?.failed
@@ -1396,7 +1390,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
 
-
             componente().preloadFrames(
 
                 1,
@@ -1405,17 +1398,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             );
 
-
             verificarCarregamento();
 
-
             await arranque;
-
 
         } catch (erro) {
 
             console.error(erro);
-
 
             window.mostrarErroAR(
 
@@ -1452,25 +1441,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
-
         cameraPreparada = true;
-
 
         estado.textContent =
             "Aponta a câmara para o selo dourado.";
 
-
         configurarFoco(scene);
 
-
-        // Continuar a carregar os próximos frames
-        // enquanto o utilizador procura o selo.
-
         componente()?.preloadFrames(
-            1,
-            BUFFER_SIZE
-        );
 
+            1,
+
+            BUFFER_SIZE
+
+        );
 
         verificarCarregamento();
 
@@ -1487,17 +1471,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         marcadorEncontrado = true;
 
-
         if (posicaoBloqueada) return;
-
 
         instanteReconhecimento =
             performance.now();
 
-
         estado.textContent =
             "A preparar a animação...";
-
 
         if (
 
@@ -1515,27 +1495,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ==================================================
-// PERDA TEMPORARIA DO SELO
+// PERDA DO SELO
 // ==================================================
 
     marcador.addEventListener("targetLost", () => {
 
         marcadorEncontrado = false;
 
-
-        // Após bloquear a posição, manter
-        // a animação completamente fixa.
-
         if (posicaoBloqueada) return;
 
-
         componente()?.cancelarBloqueio();
-
 
         document.body.classList.remove(
             "alvo-encontrado"
         );
-
 
         estado.textContent =
             "Volta a apontar para o selo dourado.";
@@ -1557,22 +1530,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // ==================================================
-// PRE-CARREGAMENTO ANTES DO CLIQUE
+// PRÉ-CARREGAMENTO
 // ==================================================
 
     function prepararBotao() {
 
         if (window.arFalhou) return;
 
-
         clearTimeout(window.limiteAR);
-
 
         botao.disabled = false;
 
         botao.textContent =
             "Iniciar experiência";
-
 
         componente()?.preloadFrames(
 
@@ -1583,7 +1553,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
     }
-
 
     if (scene.hasLoaded) {
 
@@ -1604,9 +1573,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-// ==================================================
-// LIBERTAR A CAMARA AO SAIR
-// ==================================================
+
+// LIBERTAR A CÂMARA
 
     window.addEventListener("pagehide", () => {
 
@@ -1617,7 +1585,6 @@ document.addEventListener("DOMContentLoaded", () => {
             ].stop();
 
         } catch (erro) {}
-
 
         document.querySelectorAll("video")
             .forEach(video => {
