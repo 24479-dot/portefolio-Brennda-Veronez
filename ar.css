@@ -13,11 +13,8 @@ html,
 body {
     width: 100%;
     height: 100%;
-
     overflow: hidden;
-
     font-family: Georgia, serif;
-
     background: transparent !important;
 }
 
@@ -36,7 +33,6 @@ body {
 ========================================== */
 
 body > video {
-
     position: absolute;
 
     z-index: 0 !important;
@@ -52,7 +48,6 @@ body > video {
     backdrop-filter: none !important;
 
     pointer-events: none !important;
-
 }
 
 
@@ -61,7 +56,6 @@ body > video {
 ========================================== */
 
 a-scene {
-
     position: absolute !important;
 
     inset: 0;
@@ -73,13 +67,10 @@ a-scene {
     background: transparent !important;
 
     z-index: 1 !important;
-
 }
 
 a-scene canvas {
-
     background: transparent !important;
-
 }
 
 
@@ -88,7 +79,6 @@ a-scene canvas {
 ========================================== */
 
 .ecra {
-
     position: fixed;
 
     inset: 0;
@@ -112,47 +102,37 @@ a-scene canvas {
     );
 
     color: #e8d3a3;
-
 }
 
 #erro-ar {
-
     z-index: 1001;
-
 }
 
 .conteudo {
-
     width: 100%;
 
     max-width: 340px;
 
     text-align: center;
-
 }
 
 .conteudo h1 {
-
     font-size: 30px;
 
     font-weight: normal;
 
     margin-bottom: 24px;
-
 }
 
 .conteudo h2 {
-
     font-size: 22px;
 
     font-weight: normal;
 
     margin-bottom: 24px;
-
 }
 
 .conteudo p {
-
     font-size: 15px;
 
     line-height: 1.6;
@@ -160,13 +140,10 @@ a-scene canvas {
     margin: 16px 0;
 
     color: #d8c3a2;
-
 }
 
 .conteudo .nota {
-
     font-size: 12px;
-
 }
 
 
@@ -175,7 +152,6 @@ a-scene canvas {
 ========================================== */
 
 .conteudo button {
-
     width: 100%;
 
     padding: 15px 20px;
@@ -197,19 +173,15 @@ a-scene canvas {
     cursor: pointer;
 
     touch-action: manipulation;
-
 }
 
 .conteudo button:disabled {
-
     opacity: 0.5;
 
     cursor: default;
-
 }
 
 .regresso {
-
     display: inline-block;
 
     margin-top: 12px;
@@ -219,7 +191,6 @@ a-scene canvas {
     text-decoration: none;
 
     font-size: 14px;
-
 }
 
 
@@ -228,7 +199,6 @@ a-scene canvas {
 ========================================== */
 
 .circulo-carregamento {
-
     position: relative;
 
     width: 135px;
@@ -236,31 +206,25 @@ a-scene canvas {
     height: 135px;
 
     margin: 0 auto 30px;
-
 }
 
 .circulo-carregamento svg {
-
     width: 100%;
 
     height: 100%;
 
     transform: rotate(-90deg);
-
 }
 
 .circulo-fundo {
-
     fill: none;
 
     stroke: rgba(232, 211, 163, 0.15);
 
     stroke-width: 2;
-
 }
 
 #circulo-progresso {
-
     fill: none;
 
     stroke: #d6b478;
@@ -274,11 +238,9 @@ a-scene canvas {
     stroke-dashoffset: 326.7256;
 
     transition: stroke-dashoffset 0.3s ease;
-
 }
 
 #percentagem {
-
     position: absolute;
 
     top: 50%;
@@ -288,7 +250,6 @@ a-scene canvas {
     transform: translate(-50%, -50%);
 
     font-size: 28px;
-
 }
 
 
@@ -297,7 +258,6 @@ a-scene canvas {
 ========================================== */
 
 .barra-carregamento {
-
     width: 100%;
 
     height: 3px;
@@ -307,11 +267,9 @@ a-scene canvas {
     border-radius: 10px;
 
     overflow: hidden;
-
 }
 
 #barra-progresso {
-
     width: 0;
 
     height: 100%;
@@ -321,7 +279,6 @@ a-scene canvas {
     border-radius: 10px;
 
     transition: width 0.3s ease;
-
 }
 
 
@@ -330,7 +287,6 @@ a-scene canvas {
 ========================================== */
 
 .simbolo-erro {
-
     width: 90px;
 
     height: 90px;
@@ -348,7 +304,6 @@ a-scene canvas {
     color: #d6b478;
 
     font-size: 50px;
-
 }
 
 
@@ -357,7 +312,6 @@ a-scene canvas {
 ========================================== */
 
 #interface-ar {
-
     position: fixed;
 
     inset: 0;
@@ -369,14 +323,11 @@ a-scene canvas {
     background: transparent !important;
 
     backdrop-filter: none !important;
-
 }
 
 #interface-ar::before,
 #interface-ar::after {
-
     display: none !important;
-
 }
 
 
@@ -385,7 +336,6 @@ a-scene canvas {
 ========================================== */
 
 .voltar {
-
     position: absolute;
 
     top: max(16px, env(safe-area-inset-top));
@@ -407,7 +357,6 @@ a-scene canvas {
     text-decoration: none;
 
     pointer-events: auto;
-
 }
 
 
@@ -416,7 +365,6 @@ a-scene canvas {
 ========================================== */
 
 .instrucoes {
-
     position: absolute;
 
     left: 50%;
@@ -442,31 +390,24 @@ a-scene canvas {
     color: #ead9b5;
 
     transition: opacity 0.3s ease;
-
 }
 
 .instrucoes h1 {
-
     font-size: 20px;
 
     font-weight: normal;
 
     margin-bottom: 8px;
-
 }
 
 .instrucoes p {
-
     font-size: 13px;
 
     line-height: 1.5;
-
 }
 
 body.alvo-encontrado .instrucoes {
-
     opacity: 0;
-
 }
 
 
@@ -478,9 +419,7 @@ body.alvo-encontrado .instrucoes {
 .a-enter-ar,
 .a-enter-vr-button,
 .a-enter-ar-button {
-
     display: none !important;
-
 }
 
 
@@ -491,47 +430,33 @@ body.alvo-encontrado .instrucoes {
 @media (max-width: 600px) {
 
     .voltar {
-
         font-size: 12px;
 
         padding: 9px 12px;
-
     }
 
     .instrucoes {
-
         padding: 12px 15px;
-
     }
 
     .instrucoes h1 {
-
         font-size: 18px;
-
     }
 
     .instrucoes p {
-
         font-size: 12px;
-
     }
 
     .conteudo h1 {
-
         font-size: 27px;
-
     }
 
     .conteudo h2 {
-
         font-size: 20px;
-
     }
 
     .conteudo p {
-
         font-size: 14px;
-
     }
 
 }
