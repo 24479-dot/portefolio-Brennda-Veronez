@@ -1,7 +1,8 @@
 
-// ==========================================
-// CONFIGURAÇÕES GERAIS
-// ==========================================
+// ==================================================
+// V23 — MINDAR
+// ESTABILIZAÇÃO DA POSIÇÃO E OTIMIZAÇÃO
+// ==================================================
 
 const TOTAL_FRAMES = 220;
 const FPS = 20;
@@ -9,28 +10,35 @@ const FRAME_DURATION = 1000 / FPS;
 
 const FRAME_FOLDER = "./portfolio_frames_png/";
 
-// Menor consumo de memória no telemóvel
+// Otimização do processamento
 
-const BUFFER_SIZE = 8;
+const CANVAS_WIDTH = 880;
+const CANVAS_HEIGHT = 1000;
+
+const BUFFER_SIZE = 12;
+const MAX_DOWNLOADS = 4;
+
+// Estabilização inicial
+
+const TEMPO_ESTABILIZACAO = 250;
+const MIN_AMOSTRAS = 5;
 
 let cameraPreparada = false;
 let experienciaIniciada = false;
 let carregamentoConcluido = false;
 let marcadorEncontrado = false;
+let posicaoBloqueada = false;
 
 const $ = id => document.getElementById(id);
 
 
-// ==========================================
+// ==================================================
 // CARREGAMENTO
-// ==========================================
+// ==================================================
 
 function atualizarProgresso(valor, mensagem) {
 
-    valor = Math.max(
-        0,
-        Math.min(100, valor)
-    );
+    valor = Math.max(0, Math.min(100, valor));
 
     $("percentagem").textContent =
         Math.round(valor) + "%";
@@ -50,35 +58,27 @@ function atualizarProgresso(valor, mensagem) {
 function verificarCarregamento() {
 
     if (
-
         !experienciaIniciada ||
-
         carregamentoConcluido ||
-
         window.arFalhou
-
     ) {
-
         return;
-
     }
-
 
     const componente =
         $("animacao-envelope")
             ?.components?.["sequencia-envelope"];
 
+    if (!componente) return;
 
     const primeiroFramePronto =
-        componente?.frames.get(1)?.ready;
-
+        componente.frames.get(1)?.ready;
 
     let framesProntos = 0;
 
+    for (let i = 1; i <= 4; i++) {
 
-    for (let i = 1; i <= BUFFER_SIZE; i++) {
-
-        if (componente?.frames.get(i)?.ready) {
+        if (componente.frames.get(i)?.ready) {
 
             framesProntos++;
 
@@ -86,45 +86,32 @@ function verificarCarregamento() {
 
     }
 
-
     const progresso =
-
         10 +
-
         (cameraPreparada ? 60 : 0) +
-
-        29 * framesProntos / BUFFER_SIZE;
-
+        29 * framesProntos / 4;
 
     atualizarProgresso(
 
         progresso,
 
         cameraPreparada
-
             ? "A preparar a animação..."
-
             : "A iniciar a câmara e o reconhecimento..."
 
     );
 
-
-    // Não esperar por todos os PNG para abrir a câmara
-
     if (cameraPreparada && primeiroFramePronto) {
 
         carregamentoConcluido = true;
-
         window.arPronto = true;
 
         clearTimeout(window.limiteAR);
-
 
         atualizarProgresso(
             100,
             "Experiência preparada!"
         );
-
 
         setTimeout(() => {
 
@@ -134,37 +121,34 @@ function verificarCarregamento() {
 
             if (marcadorEncontrado) {
 
-                componente.start();
+                componente.prepararBloqueio();
 
             }
 
-        }, 500);
+        }, 100);
 
     }
 
 }
 
 
-// ==========================================
-// CAMINHO DOS PNG
-// ==========================================
+// ==================================================
+// CAMINHO DOS FRAMES
+// ==================================================
 
 function framePath(number) {
 
     return FRAME_FOLDER +
-
         "frame_" +
-
         String(number).padStart(4, "0") +
-
         ".png";
 
 }
 
 
-// ==========================================
-// FOCAGEM AUTOMÁTICA
-// ==========================================
+// ==================================================
+// CONFIGURAÇÃO DA CÂMARA
+// ==================================================
 
 async function configurarFoco(scene) {
 
@@ -173,31 +157,23 @@ async function configurarFoco(scene) {
         const sistema =
             scene.systems["mindar-image-system"];
 
-
         const video =
-
             sistema.video ||
-
             document.querySelector("body > video");
 
-
         if (!video?.srcObject) return;
-
 
         const track =
             video.srcObject.getVideoTracks()[0];
 
-
         if (!track) return;
-
 
         const capacidades =
             track.getCapabilities?.() || {};
 
-
-        if (capacidades.focusMode?.includes(
-            "continuous"
-        )) {
+        if (
+            capacidades.focusMode?.includes("continuous")
+        ) {
 
             await track.applyConstraints({
 
@@ -217,26 +193,16 @@ async function configurarFoco(scene) {
 
         }
 
-
         console.log(
-
             "Configuração da câmara:",
-
             track.getSettings()
-
         );
-
 
     } catch (erro) {
 
-        // Uma falha no foco não impede a experiência
-
         console.warn(
-
             "Ajuste de foco indisponível:",
-
             erro
-
         );
 
     }
@@ -244,24 +210,22 @@ async function configurarFoco(scene) {
 }
 
 
-// ==========================================
-// VERIFICAÇÃO DAS BIBLIOTECAS
-// ==========================================
+// ==================================================
+// VERIFICAR A-FRAME
+// ==================================================
 
 if (!window.AFRAME) {
 
     window.mostrarErroAR(
-
         "Não foi possível carregar a biblioteca de realidade aumentada."
-
     );
 
 } else {
 
 
-// ==========================================
+// ==================================================
 // COMPONENTE DA ANIMAÇÃO
-// ==========================================
+// ==================================================
 
     AFRAME.registerComponent("sequencia-envelope", {
 
@@ -271,44 +235,60 @@ if (!window.AFRAME) {
 
             this.playing = false;
 
-            this.lastTime = null;
-
             this.frames = new Map();
 
+            this.downloadsAtivos = 0;
+
+            this.janelaPretendida = new Set();
+
+            this.tempoInicial = null;
+
+            this.ultimoFrameDesenhado = null;
+
+            this.aEstabilizar = false;
+
+            this.inicioEstabilizacao = null;
+
+            this.amostras = [];
+
+            this.ultimoTempoAmostra = 0;
+
+            this.meshEstavel = null;
+
+
+            // ======================================
+            // TEXTURA OTIMIZADA
+            // ======================================
 
             this.canvas =
                 document.createElement("canvas");
 
-            this.canvas.width = 1100;
+            this.canvas.width = CANVAS_WIDTH;
 
-            this.canvas.height = 1250;
-
+            this.canvas.height = CANVAS_HEIGHT;
 
             this.ctx =
                 this.canvas.getContext("2d");
 
+            this.ctx.imageSmoothingEnabled = true;
+
+            this.ctx.imageSmoothingQuality = "medium";
 
             const THREE = AFRAME.THREE;
-
 
             this.texture =
                 new THREE.CanvasTexture(this.canvas);
 
-
             this.texture.colorSpace =
                 THREE.SRGBColorSpace;
 
-
             this.texture.generateMipmaps = false;
-
 
             this.texture.minFilter =
                 THREE.LinearFilter;
 
-
             this.texture.magFilter =
                 THREE.LinearFilter;
-
 
             this.material =
                 new THREE.MeshBasicMaterial({
@@ -329,7 +309,6 @@ if (!window.AFRAME) {
                 const mesh =
                     this.el.getObject3D("mesh");
 
-
                 if (mesh) {
 
                     mesh.material = this.material;
@@ -338,85 +317,92 @@ if (!window.AFRAME) {
 
             };
 
-
             this.el.addEventListener(
-
                 "object3dset",
-
                 this.applyMaterial
-
             );
-
 
             this.applyMaterial();
 
         },
 
 
-        // ======================================
-        // CARREGAR IMAGENS
-        // ======================================
+        // ==========================================
+        // CARREGAR FRAMES
+        // ==========================================
 
         loadFrame: function (number) {
 
             if (
-
                 this.frames.has(number) ||
-
+                this.downloadsAtivos >= MAX_DOWNLOADS ||
                 window.arFalhou
-
             ) {
 
                 return;
 
             }
 
-
             const image = new Image();
 
+            image.decoding = "async";
 
             const frame = {
 
                 image: image,
 
-                ready: false
+                ready: false,
+
+                loading: true,
+
+                failed: false
 
             };
 
-
             this.frames.set(number, frame);
+
+            this.downloadsAtivos++;
 
 
             image.onload = () => {
 
+                this.downloadsAtivos--;
+
                 frame.ready = true;
 
+                frame.loading = false;
+
                 verificarCarregamento();
+
+                this.processarDownloads();
 
             };
 
 
             image.onerror = () => {
 
-                if (this.frames.get(number) !== frame) {
+                this.downloadsAtivos--;
+
+                frame.loading = false;
+
+                frame.failed = true;
+
+                console.warn(
+                    "Não foi possível carregar o frame:",
+                    number
+                );
+
+                if (number === 1 && experienciaIniciada) {
+
+                    window.mostrarErroAR(
+                        "Não foi possível carregar a primeira imagem da animação."
+                    );
 
                     return;
 
                 }
 
-
-                this.frames.delete(number);
-
-
-                window.mostrarErroAR(
-
-                    "Não foi possível carregar a imagem " +
-
-                    number +
-
-                    " da animação."
-
-                );
+                this.processarDownloads();
 
             };
 
@@ -426,217 +412,68 @@ if (!window.AFRAME) {
         },
 
 
-        // ======================================
+        // ==========================================
+        // PROCESSAR DOWNLOADS
+        // ==========================================
+
+        processarDownloads: function () {
+
+            if (window.arFalhou) return;
+
+            for (const number of this.janelaPretendida) {
+
+                if (
+                    this.downloadsAtivos >= MAX_DOWNLOADS
+                ) {
+
+                    break;
+
+                }
+
+                if (!this.frames.has(number)) {
+
+                    this.loadFrame(number);
+
+                }
+
+            }
+
+        },
+
+
+        // ==========================================
         // PRÉ-CARREGAMENTO
-        // ======================================
+        // ==========================================
 
-        preloadFrames: function (start) {
+        preloadFrames: function (
+            start,
+            quantidade = BUFFER_SIZE
+        ) {
 
-            for (let i = 0; i < BUFFER_SIZE; i++) {
+            const manter = new Set();
+
+            for (let i = 0; i < quantidade; i++) {
 
                 const number =
+                    ((start - 1 + i) % TOTAL_FRAMES) + 1;
 
-                    ((start - 1 + i) %
-
-                        TOTAL_FRAMES) + 1;
-
-
-                this.loadFrame(number);
+                manter.add(number);
 
             }
 
-        },
+            // Preservar o primeiro frame para o loop
 
+            manter.add(1);
 
-        // ======================================
-        // DESENHAR IMAGEM
-        // ======================================
+            this.janelaPretendida = manter;
 
-        drawFrame: function (number) {
 
-            const frame = this.frames.get(number);
+            for (const [number, frame] of this.frames) {
 
-
-            if (!frame?.ready) {
-
-                return false;
-
-            }
-
-
-            this.ctx.clearRect(
-
-                0,
-
-                0,
-
-                1100,
-
-                1250
-
-            );
-
-
-            this.ctx.drawImage(
-
-                frame.image,
-
-                0,
-
-                0
-
-            );
-
-
-            this.texture.needsUpdate = true;
-
-
-            return true;
-
-        },
-
-
-        // ======================================
-        // INICIAR ANIMAÇÃO
-        // ======================================
-
-        start: function () {
-
-            this.currentFrame = 1;
-
-            this.lastTime = null;
-
-            this.playing = true;
-
-
-            this.preloadFrames(1);
-
-
-            this.el.setAttribute(
-
-                "visible",
-
-                this.drawFrame(1)
-
-            );
-
-        },
-
-
-        // ======================================
-        // PARAR ANIMAÇÃO
-        // ======================================
-
-        stop: function () {
-
-            this.playing = false;
-
-            this.lastTime = null;
-
-
-            this.el.setAttribute(
-
-                "visible",
-
-                false
-
-            );
-
-        },
-
-
-        // ======================================
-        // REPRODUÇÃO DOS 220 FRAMES
-        // ======================================
-
-        tick: function (time) {
-
-            if (
-
-                !this.playing ||
-
-                !carregamentoConcluido ||
-
-                window.arFalhou
-
-            ) {
-
-                return;
-
-            }
-
-
-            if (this.lastTime === null) {
-
-                this.lastTime = time - FRAME_DURATION;
-
-            }
-
-
-            if (
-
-                time - this.lastTime < FRAME_DURATION
-
-            ) {
-
-                return;
-
-            }
-
-
-            if (!this.drawFrame(this.currentFrame)) {
-
-                this.loadFrame(this.currentFrame);
-
-                return;
-
-            }
-
-
-            this.el.setAttribute("visible", true);
-
-
-            this.lastTime += FRAME_DURATION;
-
-
-            if (time - this.lastTime > FRAME_DURATION) {
-
-                this.lastTime = time;
-
-            }
-
-
-            this.frames.delete(this.currentFrame);
-
-
-            this.currentFrame =
-
-                this.currentFrame % TOTAL_FRAMES + 1;
-
-
-            // Manter apenas os frames necessários
-
-            const manter = new Set(
-
-
-                Array.from(
-
-                    { length: BUFFER_SIZE },
-
-                    (_, i) =>
-
-                        (this.currentFrame - 1 + i) %
-
-                        TOTAL_FRAMES + 1
-
-                )
-
-            );
-
-
-            for (const number of this.frames.keys()) {
-
-                if (!manter.has(number)) {
+                if (
+                    !manter.has(number) &&
+                    !frame.loading
+                ) {
 
                     this.frames.delete(number);
 
@@ -644,52 +481,571 @@ if (!window.AFRAME) {
 
             }
 
+            this.processarDownloads();
 
-            this.preloadFrames(this.currentFrame);
+        },
+
+
+        // ==========================================
+        // DESENHAR FRAME
+        // ==========================================
+
+        drawFrame: function (number) {
+
+            const frame =
+                this.frames.get(number);
+
+            if (!frame?.ready) {
+
+                return false;
+
+            }
+
+            if (
+                this.ultimoFrameDesenhado === number
+            ) {
+
+                return true;
+
+            }
+
+            this.ctx.clearRect(
+                0,
+                0,
+                CANVAS_WIDTH,
+                CANVAS_HEIGHT
+            );
+
+            this.ctx.drawImage(
+                frame.image,
+                0,
+                0,
+                CANVAS_WIDTH,
+                CANVAS_HEIGHT
+            );
+
+            this.texture.needsUpdate = true;
+
+            this.ultimoFrameDesenhado = number;
+
+            return true;
+
+        },
+
+
+        // ==========================================
+        // PREPARAR ESTABILIZAÇÃO
+        // ==========================================
+
+        prepararBloqueio: function () {
+
+            if (
+                posicaoBloqueada ||
+                this.aEstabilizar ||
+                window.arFalhou
+            ) {
+
+                return;
+
+            }
+
+            this.aEstabilizar = true;
+
+            this.inicioEstabilizacao = null;
+
+            this.amostras = [];
+
+            this.ultimoTempoAmostra = 0;
+
+            this.preloadFrames(1);
+
+            this.el.setAttribute(
+                "visible",
+                false
+            );
+
+        },
+
+
+        // ==========================================
+        // CANCELAR ESTABILIZAÇÃO INICIAL
+        // ==========================================
+
+        cancelarBloqueio: function () {
+
+            if (posicaoBloqueada) return;
+
+            this.aEstabilizar = false;
+
+            this.inicioEstabilizacao = null;
+
+            this.amostras = [];
+
+        },
+
+
+        // ==========================================
+        // RECOLHER POSIÇÕES DO MINDAR
+        // ==========================================
+
+        recolherPosicao: function (time) {
+
+            if (
+                !marcadorEncontrado ||
+                !this.aEstabilizar
+            ) {
+
+                return;
+
+            }
+
+            if (
+                time - this.ultimoTempoAmostra < 40
+            ) {
+
+                return;
+
+            }
+
+            this.ultimoTempoAmostra = time;
+
+            const mesh =
+                this.el.getObject3D("mesh");
+
+            if (!mesh) return;
+
+            const THREE = AFRAME.THREE;
+
+            mesh.updateWorldMatrix(true, false);
+
+            const posicao = new THREE.Vector3();
+
+            const rotacao = new THREE.Quaternion();
+
+            const escala = new THREE.Vector3();
+
+            mesh.matrixWorld.decompose(
+                posicao,
+                rotacao,
+                escala
+            );
+
+            if (
+
+                !Number.isFinite(posicao.x) ||
+                !Number.isFinite(posicao.y) ||
+                !Number.isFinite(posicao.z) ||
+                !Number.isFinite(escala.x) ||
+                escala.x === 0
+
+            ) {
+
+                return;
+
+            }
+
+            if (this.inicioEstabilizacao === null) {
+
+                this.inicioEstabilizacao = time;
+
+            }
+
+            this.amostras.push({
+
+                posicao,
+
+                rotacao,
+
+                escala
+
+            });
+
+            if (this.amostras.length > 12) {
+
+                this.amostras.shift();
+
+            }
+
+            if (
+
+                this.amostras.length >= MIN_AMOSTRAS &&
+
+                time - this.inicioEstabilizacao
+                    >= TEMPO_ESTABILIZACAO
+
+            ) {
+
+                this.bloquearPosicao();
+
+            }
+
+        },
+
+
+        // ==========================================
+        // BLOQUEAR POSIÇÃO, ROTAÇÃO E ESCALA
+        // ==========================================
+
+        bloquearPosicao: function () {
+
+            if (
+                posicaoBloqueada ||
+                !this.amostras.length ||
+                !this.frames.get(1)?.ready
+            ) {
+
+                return;
+
+            }
+
+            const THREE = AFRAME.THREE;
+
+            const original =
+                this.el.getObject3D("mesh");
+
+            if (!original) return;
+
+
+            const mediana = valores => {
+
+                const ordenados =
+                    [...valores].sort((a, b) => a - b);
+
+                const meio =
+                    Math.floor(ordenados.length / 2);
+
+                return ordenados.length % 2
+                    ? ordenados[meio]
+                    : (
+                        ordenados[meio - 1] +
+                        ordenados[meio]
+                    ) / 2;
+
+            };
+
+
+            // Posição estável
+
+            const posicao =
+                new THREE.Vector3(
+
+                    mediana(
+                        this.amostras.map(
+                            a => a.posicao.x
+                        )
+                    ),
+
+                    mediana(
+                        this.amostras.map(
+                            a => a.posicao.y
+                        )
+                    ),
+
+                    mediana(
+                        this.amostras.map(
+                            a => a.posicao.z
+                        )
+                    )
+
+                );
+
+
+            // Escala estável
+
+            const escala =
+                new THREE.Vector3(
+
+                    mediana(
+                        this.amostras.map(
+                            a => a.escala.x
+                        )
+                    ),
+
+                    mediana(
+                        this.amostras.map(
+                            a => a.escala.y
+                        )
+                    ),
+
+                    mediana(
+                        this.amostras.map(
+                            a => a.escala.z
+                        )
+                    )
+
+                );
+
+
+            // Suavizar a rotação inicial
+
+            const rotacao =
+                this.amostras[0].rotacao.clone();
+
+            for (
+                let i = 1;
+                i < this.amostras.length;
+                i++
+            ) {
+
+                rotacao.slerp(
+                    this.amostras[i].rotacao,
+                    1 / (i + 1)
+                );
+
+            }
+
+
+            // Criar uma representação independente
+            // das oscilações posteriores do marcador
+
+            this.meshEstavel =
+                new THREE.Mesh(
+
+                    original.geometry.clone(),
+
+                    this.material
+
+                );
+
+
+            const matrizMundo =
+                new THREE.Matrix4().compose(
+
+                    posicao,
+
+                    rotacao,
+
+                    escala
+
+                );
+
+
+            const raiz =
+                this.el.sceneEl.object3D;
+
+            raiz.updateWorldMatrix(true, false);
+
+
+            const inversa =
+                raiz.matrixWorld.clone().invert();
+
+
+            this.meshEstavel.matrix.multiplyMatrices(
+
+                inversa,
+
+                matrizMundo
+
+            );
+
+
+            this.meshEstavel.matrixAutoUpdate = false;
+
+            this.meshEstavel.matrixWorldNeedsUpdate = true;
+
+            this.meshEstavel.frustumCulled = false;
+
+            this.meshEstavel.visible = true;
+
+
+            this.drawFrame(1);
+
+            raiz.add(this.meshEstavel);
+
+
+            // Ocultar a representação original
+
+            this.el.setAttribute(
+                "visible",
+                false
+            );
+
+
+            // Bloquear definitivamente a posição virtual
+
+            posicaoBloqueada = true;
+
+            this.aEstabilizar = false;
+
+            this.playing = true;
+
+            this.tempoInicial = null;
+
+            this.currentFrame = 1;
+
+
+            document.body.classList.add(
+                "alvo-encontrado"
+            );
+
+
+            $("estado").textContent =
+                "Selo reconhecido!";
+
+
+            console.log(
+                "V23 — Posição virtual bloqueada."
+            );
+
+        },
+
+
+        // ==========================================
+        // REPRODUZIR A ANIMAÇÃO
+        // ==========================================
+
+        tick: function (time) {
+
+            if (window.arFalhou) {
+
+                if (this.meshEstavel) {
+
+                    this.meshEstavel.visible = false;
+
+                }
+
+                return;
+
+            }
+
+
+            // Estabilizar após deteção do selo
+
+            if (
+                this.aEstabilizar &&
+                carregamentoConcluido
+            ) {
+
+                this.recolherPosicao(time);
+
+            }
+
+
+            if (
+                !this.playing ||
+                !posicaoBloqueada ||
+                !carregamentoConcluido
+            ) {
+
+                return;
+
+            }
+
+
+            if (this.tempoInicial === null) {
+
+                this.tempoInicial = time;
+
+            }
+
+
+            // Manter a duração prevista da animação,
+            // mesmo quando o dispositivo perde frames.
+
+            const tempoDecorrido =
+                time - this.tempoInicial;
+
+
+            const framePretendido =
+
+                Math.floor(
+                    tempoDecorrido / FRAME_DURATION
+                ) % TOTAL_FRAMES + 1;
+
+
+            if (
+                framePretendido === this.currentFrame &&
+                this.ultimoFrameDesenhado === framePretendido
+            ) {
+
+                return;
+
+            }
+
+
+            this.currentFrame = framePretendido;
+
+            this.preloadFrames(framePretendido);
+
+
+            // Se o frame ainda não estiver disponível,
+            // manter temporariamente o último visível.
+
+            this.drawFrame(framePretendido);
+
+        },
+
+
+        // ==========================================
+        // LIBERTAR RECURSOS
+        // ==========================================
+
+        remove: function () {
+
+            this.playing = false;
+
+            this.aEstabilizar = false;
+
+            if (this.meshEstavel) {
+
+                this.meshEstavel.parent?.remove(
+                    this.meshEstavel
+                );
+
+                this.meshEstavel.geometry.dispose();
+
+            }
+
+            this.el.removeEventListener(
+                "object3dset",
+                this.applyMaterial
+            );
+
+            this.texture.dispose();
+
+            this.material.dispose();
+
+            this.frames.clear();
 
         }
 
     });
 
 
-// ==========================================
+// ==================================================
 // INICIALIZAÇÃO DA EXPERIÊNCIA
-// ==========================================
+// ==================================================
 
     document.addEventListener("DOMContentLoaded", () => {
 
         const scene =
             document.querySelector("a-scene");
 
-
         const marcador =
             $("marcador");
-
 
         const animacao =
             $("animacao-envelope");
 
-
         const estado =
             $("estado");
-
 
         const botao =
             $("iniciar-experiencia");
 
+        const componente = () =>
+            animacao.components["sequencia-envelope"];
 
-// ==========================================
-// INICIAR ATRAVÉS DO BOTÃO
-// ==========================================
+
+// ==================================================
+// INICIAR EXPERIÊNCIA
+// ==================================================
 
         botao.addEventListener("click", async () => {
 
             if (
-
                 experienciaIniciada ||
-
                 window.arFalhou
-
             ) {
 
                 return;
@@ -700,9 +1056,7 @@ if (!window.AFRAME) {
             if (!window.isSecureContext) {
 
                 window.mostrarErroAR(
-
                     "A câmara necessita de uma ligação HTTPS."
-
                 );
 
                 return;
@@ -710,12 +1064,12 @@ if (!window.AFRAME) {
             }
 
 
-            if (!navigator.mediaDevices?.getUserMedia) {
+            if (
+                !navigator.mediaDevices?.getUserMedia
+            ) {
 
                 window.mostrarErroAR(
-
                     "Este navegador não disponibiliza acesso à câmara."
-
                 );
 
                 return;
@@ -727,34 +1081,28 @@ if (!window.AFRAME) {
 
             botao.disabled = true;
 
-
             $("inicio-ar").hidden = true;
 
             $("carregamento-ar").hidden = false;
 
 
             atualizarProgresso(
-
                 0,
-
                 "A iniciar a câmara..."
-
             );
 
 
             clearTimeout(window.limiteAR);
 
 
-            // Mais tolerância para dispositivos móveis
+            // Manter proteção contra bloqueios
 
             window.limiteAR = setTimeout(() => {
 
                 if (!window.arPronto) {
 
                     window.mostrarErroAR(
-
                         "A experiência demorou demasiado tempo a carregar."
-
                     );
 
                 }
@@ -767,37 +1115,37 @@ if (!window.AFRAME) {
                 const sistema =
                     scene.systems["mindar-image-system"];
 
-
                 if (!sistema) {
 
                     throw new Error(
-
                         "MindAR não está disponível."
-
                     );
 
                 }
 
 
-                // Iniciar MindAR diretamente após o toque
+                // Iniciar MindAR imediatamente
 
                 const arranque = sistema.start();
 
 
-                // Carregar apenas os primeiros 8 frames
+                // Recuperar eventual falha no pré-carregamento
 
-                animacao.components[
-                    "sequencia-envelope"
-                ].preloadFrames(1);
+                if (
+                    componente().frames.get(1)?.failed
+                ) {
+
+                    componente().frames.delete(1);
+
+                }
 
 
-                atualizarProgresso(
+                // Carregar apenas os frames iniciais
 
-                    10,
+                componente().preloadFrames(1, 4);
 
-                    "A preparar o reconhecimento..."
 
-                );
+                verificarCarregamento();
 
 
                 await arranque;
@@ -806,7 +1154,6 @@ if (!window.AFRAME) {
             } catch (erro) {
 
                 console.error(erro);
-
 
                 window.mostrarErroAR(
 
@@ -823,9 +1170,9 @@ if (!window.AFRAME) {
         });
 
 
-// ==========================================
-// CÂMARA PREPARADA
-// ==========================================
+// ==================================================
+// MINDAR PREPARADO
+// ==================================================
 
         scene.addEventListener("arReady", () => {
 
@@ -837,7 +1184,7 @@ if (!window.AFRAME) {
                         "mindar-image-system"
                     ].stop();
 
-                } catch (e) {}
+                } catch (erro) {}
 
                 return;
 
@@ -848,11 +1195,8 @@ if (!window.AFRAME) {
 
 
             estado.textContent =
+                "Aponta a câmara para o selo dourado.";
 
-                "Aponta a câmara para o envelope completo.";
-
-
-            // Ajuste de foco sem bloquear a experiência
 
             configurarFoco(scene);
 
@@ -862,112 +1206,107 @@ if (!window.AFRAME) {
         });
 
 
-// ==========================================
-// ENVELOPE RECONHECIDO
-// ==========================================
+// ==================================================
+// SELO RECONHECIDO
+// ==================================================
 
         marcador.addEventListener("targetFound", () => {
 
             if (window.arFalhou) return;
 
-
             marcadorEncontrado = true;
 
 
-            document.body.classList.add(
+            if (posicaoBloqueada) {
 
-                "alvo-encontrado"
+                return;
 
-            );
+            }
 
 
             estado.textContent =
-
-                "Envelope reconhecido!";
+                "A estabilizar a experiência...";
 
 
             if (
-
                 carregamentoConcluido &&
-
                 $("carregamento-ar").hidden
-
             ) {
 
-                animacao.components[
-
-                    "sequencia-envelope"
-
-                ].start();
+                componente().prepararBloqueio();
 
             }
 
         });
 
 
-// ==========================================
-// PERDA TEMPORÁRIA DO MARCADOR
-// ==========================================
+// ==================================================
+// PERDA TEMPORÁRIA DO SELO
+// ==================================================
 
         marcador.addEventListener("targetLost", () => {
 
             marcadorEncontrado = false;
 
 
+            // Após o bloqueio, não interromper
+            // nem reiniciar a animação.
+
+            if (posicaoBloqueada) {
+
+                return;
+
+            }
+
+
+            componente()?.cancelarBloqueio();
+
+
             document.body.classList.remove(
-
                 "alvo-encontrado"
-
             );
 
 
             estado.textContent =
-
-                "Volta a apontar para o envelope.";
-
-
-            animacao.components[
-
-                "sequencia-envelope"
-
-            ]?.stop();
+                "Volta a apontar para o selo dourado.";
 
         });
 
 
-// ==========================================
+// ==================================================
 // ERRO MINDAR
-// ==========================================
+// ==================================================
 
         scene.addEventListener("arError", () => {
 
             window.mostrarErroAR(
-
                 "Não foi possível inicializar a câmara. Verifica as permissões e experimenta novamente."
-
             );
 
         });
 
 
-// ==========================================
-// ATIVAR BOTÃO INICIAL
-// ==========================================
+// ==================================================
+// PRÉ-CARREGAMENTO ANTES DO CLIQUE
+// ==================================================
 
         function prepararBotao() {
 
             if (window.arFalhou) return;
-
 
             clearTimeout(window.limiteAR);
 
 
             botao.disabled = false;
 
-
             botao.textContent =
-
                 "Iniciar experiência";
+
+
+            // Começar a preparar os primeiros frames
+            // antes de o utilizador carregar no botão.
+
+            componente()?.preloadFrames(1, 3);
 
         }
 
@@ -991,9 +1330,9 @@ if (!window.AFRAME) {
         }
 
 
-// ==========================================
+// ==================================================
 // LIBERTAR A CÂMARA AO SAIR
-// ==========================================
+// ==================================================
 
         window.addEventListener("pagehide", () => {
 
@@ -1003,7 +1342,7 @@ if (!window.AFRAME) {
                     "mindar-image-system"
                 ].stop();
 
-            } catch (e) {}
+            } catch (erro) {}
 
 
             document.querySelectorAll("video")
