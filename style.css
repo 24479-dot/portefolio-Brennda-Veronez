@@ -1,822 +1,725 @@
 
-/* ==============================================================
-   FONTES LOCAIS
-   ============================================================== */
+/* V32 - PORTEFOLIO BRENNDA VERONEZ */
+
+/* FONTES LOCAIS */
 
 @font-face {
-    font-family: 'Maquina Elegante';
-    src: url('fontes/maquina-elegante-regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Maquina Elegante';
+  src: url('fontes/maquina-elegante-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Maquina Elegante';
-    src: url('fontes/maquina-elegante-negrito.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Maquina Elegante';
+  src: url('fontes/maquina-elegante-negrito.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Maquina Elegante';
-    src: url('fontes/maquina-elegante-italico.ttf') format('truetype');
-    font-weight: 400;
-    font-style: italic;
-    font-display: swap;
+  font-family: 'Maquina Elegante';
+  src: url('fontes/maquina-elegante-italico.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Maquina Elegante';
-    src: url('fontes/maquina-elegante-leve.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Maquina Elegante';
+  src: url('fontes/maquina-elegante-leve.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Chomsky';
-    src: url('fontes/chomsky.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Chomsky';
+  src: url('fontes/chomsky.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-
-/* ==============================================================
-   BASE
-   ============================================================== */
+/* BASE */
 
 :root {
-    --vinho: #510d17;
-    --papel: #f3ead3;
-    --altura-menu: 2.7rem;
+  --vinho: #510d17;
+  --papel: #f3ead3;
+  --altura-menu: 2.7rem;
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html {
-    scroll-behavior: smooth;
-    scroll-padding-top: var(--altura-menu);
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--altura-menu);
 }
 
 body {
-    margin: 0;
-    background: var(--vinho);
-    color: #282017;
-    font: 400 1rem 'Maquina Elegante', 'Courier New', monospace;
+  margin: 0;
+  background: var(--vinho);
+  color: #282017;
+  font: 400 1rem 'Maquina Elegante', 'Courier New', monospace;
 }
 
 h1,
 h2,
 h3,
 p {
-    margin: 0;
+  margin: 0;
 }
 
 a {
-    color: inherit;
+  color: inherit;
 }
 
 img {
-    display: block;
-    max-width: 100%;
+  display: block;
+  max-width: 100%;
 }
 
 .texto-acessivel {
-    position: absolute;
-    width: .0625rem;
-    height: .0625rem;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+  position: absolute;
+  width: .0625rem;
+  height: .0625rem;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-
-/* ==============================================================
-   MENU FIXO
-   ============================================================== */
+/* MENU FIXO */
 
 .saltar-menu {
-    position: fixed;
-    top: -10rem;
-    left: 1rem;
-    z-index: 110;
-    padding: .7rem;
-    background: var(--papel);
+  position: fixed;
+  top: -10rem;
+  left: 1rem;
+  z-index: 110;
+  padding: .7rem;
+  background: var(--papel);
 }
 
 .saltar-menu:focus {
-    top: .5rem;
+  top: .5rem;
 }
 
 .menu-fixo {
-    position: fixed;
-    inset: 0 0 auto;
-    width: 100%;
-    z-index: 100;
-    color: var(--papel);
-    background: #510d17f2;
-    border-bottom: .0625rem solid #cfb48166;
+  position: fixed;
+  inset: 0 0 auto;
+  width: 100%;
+  z-index: 100;
+  color: var(--papel);
+  background: #510d17f2;
+  border-bottom: .0625rem solid #cfb48166;
 }
 
 .menu-fixo nav {
-    min-height: 2.7rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2.8vw;
-    padding: .45rem 2vw;
+  min-height: 2.7rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.8vw;
+  padding: .45rem 2vw;
 }
 
 .menu-fixo a {
-    font-size: clamp(.65rem, .85vw, .9rem);
-    text-decoration: none;
-    white-space: nowrap;
-    padding: .2em 0;
+  font-size: clamp(.65rem, .85vw, .9rem);
+  text-decoration: none;
+  white-space: nowrap;
+  padding: .2em 0;
 }
 
 .menu-fixo a:first-child {
-    font: 400 1.1rem 'Chomsky', Georgia, serif;
+  font: 400 1.1rem 'Chomsky', Georgia, serif;
 }
 
 .menu-fixo a:hover,
 .menu-fixo a[aria-current] {
-    color: #e8c57d;
-    text-decoration: underline;
-    text-underline-offset: .3em;
+  color: #e8c57d;
+  text-decoration: underline;
+  text-underline-offset: .3em;
 }
 
 a:focus-visible {
-    outline: .15rem solid #e8c57d;
-    outline-offset: .25rem;
+  outline: .15rem solid #e8c57d;
+  outline-offset: .25rem;
 }
 
-
-/* ==============================================================
-   REGRAS COMUNS
-   ============================================================== */
+/* REGRAS COMUNS */
 
 main {
-    padding-top: var(--altura-menu);
+  padding-top: var(--altura-menu);
 }
 
 .secao-portfolio {
-    position: relative;
-    isolation: isolate;
-    width: 100%;
-    height: max(100svh, 56.25vw);
-    overflow: hidden;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: max(100svh, 56.25vw);
+  overflow: hidden;
 }
 
 .camada-fundo {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: fill;
-    z-index: 1;
-    pointer-events: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .imagem-sobreposta {
-    position: absolute;
-    z-index: 2;
-    object-fit: contain;
+  position: absolute;
+  z-index: 2;
+  object-fit: contain;
 }
 
 .caixa-visual {
-    position: absolute;
-    z-index: 3;
+  position: absolute;
+  z-index: 3;
 }
 
 .imagem-caixa {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .conteudo-caixa {
-    position: absolute;
-    z-index: 4;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-width: 0;
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
 }
 
 .conteudo-caixa > p,
 .conteudo-caixa > span,
 .texto-formacao > h3 {
-    flex: 0 0 auto;
+  flex: 0 0 auto;
 }
 
-
-/* ==============================================================
-   SECÇÃO 01 — CAPA
-   ============================================================== */
+/* SECCAO 01 - CAPA */
 
 .caderno-capa {
-    left: 18%;
-    top: 0;
-    width: 61%;
-    aspect-ratio: 878 / 746;
+  left: 18%;
+  top: 0;
+  width: 61%;
+  aspect-ratio: 878 / 746;
 }
 
 .conteudo-capa {
-    inset: 30% 15% 13% 18%;
-    justify-content: space-between;
+  inset: 30% 15% 13% 18%;
+  justify-content: space-between;
 }
 
 .cabecalho-livro,
 .base-livro {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1em;
-    align-items: start;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  align-items: start;
 }
 
 .contato-capa,
 .rodape-livro {
-    text-align: right;
+  text-align: right;
 }
 
 .base-livro {
-    align-items: end;
+  align-items: end;
 }
 
 .nome-autora,
 .rodape-livro,
 .contato-capa,
 .producao-capa {
-    font-size: clamp(.45rem, .8vw, .9rem);
+  font-size: clamp(.45rem, .8vw, .9rem);
 }
 
 .conteudo-capa h1,
 .conteudo-capa h1 img {
-    width: 100%;
+  width: 100%;
 }
 
-
-/* ==============================================================
-   SECÇÃO 02 — CARTA
-   V22 — ENVELOPE MAIS PEQUENO
-   SELO COM DIMENSÃO ABSOLUTA PRESERVADA
-   ============================================================== */
+/* ========================================
+   SECCAO 02 - CARTA
+   V32 - ENVELOPE MAIOR
+   SELO COM O MESMO TAMANHO
+   ======================================== */
 
 .composicao-carta {
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    width: 65%;
-
-    aspect-ratio: 1405 / 733;
-
-    transform: translate(-50%, -50%);
-
-    z-index: 2;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 72%;
+  aspect-ratio: 1405 / 733;
+  transform: translate(-50%, -50%);
+  z-index: 2;
 }
-
-
-/* ENVELOPE */
 
 .envelope {
-    position: absolute;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    z-index: 2;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 2;
 }
-
-
-/* SELO DOURADO — TARGET MINDAR */
 
 .selo-carta,
 #selo-carta {
-    position: absolute;
-
-    left: 50% !important;
-    top: 76% !important;
-
-    width: 29.2307692308% !important;
-    max-width: none !important;
-
-    height: auto !important;
-
-    transform: translate(-50%, -50%) !important;
-
-    object-fit: contain;
-
-    z-index: 3;
+  position: absolute;
+  left: 50% !important;
+  top: 76% !important;
+  width: 26.3888889% !important;
+  max-width: none !important;
+  height: auto !important;
+  transform: translate(-50%, -50%) !important;
+  object-fit: contain;
+  z-index: 3;
 }
-
 
 .secao-carta > .camada-fundo {
-    object-fit: fill;
+  object-fit: fill;
 }
 
-
-/* ==============================================================
-   SECÇÃO 03 — SOBRE MIM
-   ============================================================== */
+/* SECCAO 03 - SOBRE MIM */
 
 .retrato {
-    left: 2%;
-    top: 12%;
-    width: 40%;
-    height: 78%;
+  left: 2%;
+  top: 12%;
+  width: 40%;
+  height: 78%;
 }
 
 .quadro-apresentacao {
-    left: 46%;
-    top: 12%;
-    width: 48%;
-    aspect-ratio: 753 / 638;
+  left: 46%;
+  top: 12%;
+  width: 48%;
+  aspect-ratio: 753 / 638;
 }
 
 .biografia {
-    inset: 26% 11% 22% 19%;
-    gap: .7em;
-    font-size: clamp(.65rem, 1.08vw, 1.4rem);
-    line-height: 1.32;
-    text-align: justify;
-    text-align-last: left;
-    hyphens: auto;
-    overflow-wrap: break-word;
+  inset: 26% 11% 22% 19%;
+  gap: .7em;
+  font-size: clamp(.65rem, 1.08vw, 1.4rem);
+  line-height: 1.32;
+  text-align: justify;
+  text-align-last: left;
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
-
-/* ==============================================================
-   SECÇÃO 04 — ESCOLARIDADE
-   ============================================================== */
+/* SECCAO 04 - ESCOLARIDADE */
 
 .fundo-formacao-continuo {
-    height: 200%;
-    object-fit: fill;
+  height: 200%;
+  object-fit: fill;
 }
 
 .fundo-formacao-inferior {
-    top: -100%;
+  top: -100%;
 }
 
 .cartao-formacao {
-    width: 27%;
-    aspect-ratio: 366 / 228;
+  width: 27%;
+  aspect-ratio: 366 / 228;
 }
 
 .cartao-ensino-secundario {
-    left: 21%;
-    top: 17%;
+  left: 21%;
+  top: 17%;
 }
 
 .cartao-design-multimedia {
-    left: 59%;
-    top: 29%;
+  left: 59%;
+  top: 29%;
 }
 
 .cartao-administracao {
-    left: 21%;
-    top: 56%;
+  left: 21%;
+  top: 56%;
 }
 
 .cartao-curso-blender {
-    left: 59%;
-    top: 68%;
+  left: 59%;
+  top: 68%;
 }
 
 .texto-formacao {
-    inset: 22% 8% 12% 34%;
-    align-items: center;
-    text-align: center;
-    font-size: clamp(.65rem, 1.2vw, 1.4rem);
-    line-height: 1.2;
+  inset: 22% 8% 12% 34%;
+  align-items: center;
+  text-align: center;
+  font-size: clamp(.65rem, 1.2vw, 1.4rem);
+  line-height: 1.2;
 }
 
 .texto-formacao h3 {
-    font: inherit;
-    font-weight: 700;
-    color: #753225;
+  font: inherit;
+  font-weight: 700;
+  color: #753225;
 }
 
-
-/* ==============================================================
-   SECÇÃO 05 — HABILIDADES
-   ============================================================== */
+/* SECCAO 05 - HABILIDADES */
 
 .grade-habilidades {
-    position: absolute;
-    z-index: 3;
-    left: 23%;
-    top: 5%;
-    width: 48%;
-    height: 72%;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-content: space-between;
-    gap: 2rem 5vw;
+  position: absolute;
+  z-index: 3;
+  left: 23%;
+  top: 5%;
+  width: 48%;
+  height: 72%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: space-between;
+  gap: 2rem 5vw;
 }
 
 .etiqueta-programa {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 285 / 89;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 285 / 89;
 }
 
 .etiqueta-programa .conteudo-caixa {
-    inset: 17% 7% 15% 37%;
-    align-items: center;
-    text-align: center;
-    font-size: clamp(.6rem, 1.1vw, 1.3rem);
+  inset: 17% 7% 15% 37%;
+  align-items: center;
+  text-align: center;
+  font-size: clamp(.6rem, 1.1vw, 1.3rem);
 }
 
-
-/* ==============================================================
-   SECÇÃO 06 — ABERTURA DOS TRABALHOS
-   ============================================================== */
+/* SECCAO 06 - ABERTURA DOS TRABALHOS */
 
 .quadro-trabalhos {
-    left: 22%;
-    top: 13%;
-    width: 56%;
-    aspect-ratio: 788 / 552;
+  left: 22%;
+  top: 13%;
+  width: 56%;
+  aspect-ratio: 788 / 552;
 }
 
 .quadro-trabalhos .conteudo-caixa {
-    inset: 29% 14%;
+  inset: 29% 14%;
 }
 
 .quadro-trabalhos h2 img {
-    width: 100%;
+  width: 100%;
 }
 
-
-/* ==============================================================
-   GALERIA — FUNDO E CARTÕES
-   ============================================================== */
+/* GALERIA */
 
 .sequencia-galeria {
-    position: relative;
-    isolation: isolate;
+  position: relative;
+  isolation: isolate;
 }
 
 .fundo-galeria-continuo {
-    object-fit: fill;
+  object-fit: fill;
 }
 
 .secao-galeria {
-    z-index: 2;
-    height: auto;
+  z-index: 2;
+  height: auto;
 }
 
 .imagem-trabalho {
-    height: auto;
+  height: auto;
 }
 
 .legenda {
-    height: auto;
-    aspect-ratio: 675 / 565;
+  height: auto;
+  aspect-ratio: 675 / 565;
 }
 
 .legenda .conteudo-caixa {
-    inset: 39% 20% 30% 47%;
-    align-items: center;
-    text-align: center;
-    color: #6e1f20;
-    font-size: clamp(.65rem, 1.3vw, 1.5rem);
-    font-weight: 700;
-    line-height: 1.25;
-    overflow-wrap: normal;
+  inset: 39% 20% 30% 47%;
+  align-items: center;
+  text-align: center;
+  color: #6e1f20;
+  font-size: clamp(.65rem, 1.3vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: normal;
 }
 
 .legenda h2 span {
-    color: #282017;
-    font-weight: 700;
+  color: #282017;
+  font-weight: 700;
 }
 
-
-/* ==============================================================
-   SECÇÃO 07 — CARTAZES
-   ============================================================== */
+/* SECCAO 07 - CARTAZES */
 
 .secao-cartazes {
-    height: 62vw;
+  height: 62vw;
 }
 
 .imagem-poster {
-    left: 3%;
-    top: 3%;
-    width: 40%;
+  left: 3%;
+  top: 3%;
+  width: 40%;
 }
 
 .imagem-cartaz {
-    left: 44%;
-    top: 35%;
-    width: 26%;
+  left: 44%;
+  top: 35%;
+  width: 26%;
 }
 
 .imagem-flyer {
-    left: 71%;
-    top: 35%;
-    width: 26%;
+  left: 71%;
+  top: 35%;
+  width: 26%;
 }
 
 .legenda-cartazes {
-    left: 43%;
-    top: 2%;
-    width: 43%;
-    aspect-ratio: 675 / 396;
+  left: 43%;
+  top: 2%;
+  width: 43%;
+  aspect-ratio: 675 / 396;
 }
 
 .legenda-cartazes .conteudo-caixa {
-    inset: 39% 20% 31% 45%;
+  inset: 39% 20% 31% 45%;
 }
 
-
-/* ==============================================================
-   SECÇÃO 08 — ILUSTRAÇÃO VETORIAL
-   ============================================================== */
+/* SECCAO 08 - ILUSTRACAO VETORIAL */
 
 .secao-ilustracao-vetorial {
-    height: 60vw;
+  height: 60vw;
 }
 
 .trabalho-lampada {
-    left: 3%;
-    top: 3%;
-    width: 39%;
+  left: 3%;
+  top: 3%;
+  width: 39%;
 }
 
 .legenda-lampada {
-    left: 44%;
-    top: 14%;
-    width: 45%;
+  left: 44%;
+  top: 14%;
+  width: 45%;
 }
 
-
-/* ==============================================================
-   SECÇÃO 09 — PERSONAGENS
-   ============================================================== */
+/* SECCAO 09 - PERSONAGENS */
 
 .secao-personagens {
-    height: 48vw;
+  height: 48vw;
 }
 
 .imagem-personagem-colorida {
-    left: 3%;
-    top: 2%;
-    width: 31%;
+  left: 3%;
+  top: 2%;
+  width: 31%;
 }
 
 .imagem-personagem-preto-branco {
-    left: 36%;
-    top: 2%;
-    width: 31%;
+  left: 36%;
+  top: 2%;
+  width: 31%;
 }
 
 .legenda-personagens {
-    left: 68%;
-    top: 24%;
-    width: 30%;
-    aspect-ratio: 508 / 336;
+  left: 68%;
+  top: 24%;
+  width: 30%;
+  aspect-ratio: 508 / 336;
 }
 
 .legenda-personagens .conteudo-caixa {
-    inset: 39% 22% 30% 43%;
-    font-size: clamp(.6rem, 1.1vw, 1.3rem);
-    line-height: 1.15;
+  inset: 39% 22% 30% 43%;
+  font-size: clamp(.6rem, 1.1vw, 1.3rem);
+  line-height: 1.15;
 }
 
-
-/* ==============================================================
-   SECÇÃO 10 — CENÁRIO
-   ============================================================== */
+/* SECCAO 10 - CENARIO */
 
 .secao-cenario {
-    height: 51.5573vw;
+  height: 51.5573vw;
 }
 
 .trabalho-cenario {
-    left: 61%;
-    top: 1%;
-    width: 35.5%;
+  left: 61%;
+  top: 1%;
+  width: 35.5%;
 }
 
 .legenda-cenario {
-    left: 8%;
-    top: 7%;
-    width: 45%;
+  left: 8%;
+  top: 7%;
+  width: 45%;
 }
 
-
-/* ==============================================================
-   ADAPTAÇÃO PARA ECRÃS VERTICAIS
-   ============================================================== */
+/* ========================================
+   ADAPTACAO PARA ECRAS VERTICAIS
+   ======================================== */
 
 @media (max-aspect-ratio: 6/5) {
 
-    /* MENU FIXO */
+  .menu-fixo nav {
+    gap: .35rem 1rem;
+    flex-wrap: wrap;
+    padding: .6rem 1rem;
+  }
 
-    .menu-fixo nav {
-        gap: .35rem 1rem;
-        flex-wrap: wrap;
-        padding: .6rem 1rem;
-    }
+  .menu-fixo a {
+    font-size: .7rem;
+  }
 
-    .menu-fixo a {
-        font-size: .7rem;
-    }
+  .secao-portfolio {
+    height: 100svh;
+  }
 
+  /* CAPA */
 
-    /* REGRAS COMUNS */
+  .caderno-capa {
+    left: 2%;
+    top: 0;
+    width: 96%;
+  }
 
-    .secao-portfolio {
-        height: 100svh;
-    }
+  .nome-autora,
+  .rodape-livro,
+  .producao-capa,
+  .contato-capa {
+    font-size: clamp(.5rem, 1.9vw, .9rem);
+  }
 
+  /* CARTA - V32 */
 
-    /* SECÇÃO 01 — CAPA */
+  .composicao-carta {
+    left: 50%;
+    top: 50%;
+    width: 78%;
+    transform: translate(-50%, -50%);
+  }
 
-    .caderno-capa {
-        left: 2%;
-        top: 0;
-        width: 96%;
-    }
+  .selo-carta,
+  #selo-carta {
+    left: 50% !important;
+    top: 76% !important;
+    width: 26.9230769% !important;
+    max-width: none !important;
+    height: auto !important;
+    transform: translate(-50%, -50%) !important;
+  }
 
-    .nome-autora,
-    .rodape-livro,
-    .contato-capa,
-    .producao-capa {
-        font-size: clamp(.5rem, 1.9vw, .9rem);
-    }
+  /* SOBRE MIM */
 
+  .retrato {
+    left: 22%;
+    top: 2%;
+    width: 56%;
+    height: 40%;
+  }
 
-    /* SECÇÃO 02 — CARTA V22 */
+  .quadro-apresentacao {
+    left: 5%;
+    top: 44%;
+    width: 90%;
+  }
 
-    .composicao-carta {
-        left: 50%;
-        top: 50%;
+  .biografia {
+    font-size: clamp(.65rem, 2.55vw, 1rem);
+    line-height: 1.25;
+    gap: .6em;
+  }
 
-        width: 72%;
+  /* ESCOLARIDADE */
 
-        transform: translate(-50%, -50%);
-    }
+  .cartao-formacao {
+    width: 63%;
+  }
 
-    .selo-carta,
-    #selo-carta {
-        left: 50% !important;
-        top: 76% !important;
+  .cartao-ensino-secundario {
+    left: 8%;
+    top: 3%;
+  }
 
-        width: 29.1666666667% !important;
-        max-width: none !important;
+  .cartao-design-multimedia {
+    left: 29%;
+    top: 27%;
+  }
 
-        height: auto !important;
+  .cartao-administracao {
+    left: 8%;
+    top: 51%;
+  }
 
-        transform: translate(-50%, -50%) !important;
-    }
+  .cartao-curso-blender {
+    left: 29%;
+    top: 75%;
+  }
 
+  .texto-formacao {
+    font-size: clamp(.65rem, 2.8vw, 1.1rem);
+  }
 
-    /* SECÇÃO 03 — SOBRE MIM */
+  /* HABILIDADES */
 
-    .retrato {
-        left: 22%;
-        top: 2%;
-        width: 56%;
-        height: 40%;
-    }
+  .grade-habilidades {
+    left: 16%;
+    top: 9%;
+    width: 69%;
+    height: 72%;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5vh;
+  }
 
-    .quadro-apresentacao {
-        left: 5%;
-        top: 44%;
-        width: 90%;
-    }
+  .etiqueta-programa {
+    max-height: 10vh;
+  }
 
-    .biografia {
-        font-size: clamp(.65rem, 2.55vw, 1rem);
-        line-height: 1.25;
-        gap: .6em;
-    }
+  .etiqueta-programa .conteudo-caixa {
+    font-size: clamp(.8rem, 3.2vw, 1.15rem);
+  }
 
+  /* ABERTURA DOS TRABALHOS */
 
-    /* SECÇÃO 04 — ESCOLARIDADE */
+  .quadro-trabalhos {
+    left: 5%;
+    top: 26%;
+    width: 90%;
+  }
 
-    .cartao-formacao {
-        width: 63%;
-    }
+  /* GALERIA */
 
-    .cartao-ensino-secundario {
-        left: 8%;
-        top: 3%;
-    }
+  .legenda .conteudo-caixa {
+    font-size: 1.3vw;
+  }
 
-    .cartao-design-multimedia {
-        left: 29%;
-        top: 27%;
-    }
+  .secao-cartazes {
+    height: 62vw;
+  }
 
-    .cartao-administracao {
-        left: 8%;
-        top: 51%;
-    }
+  .secao-ilustracao-vetorial {
+    height: 60vw;
+  }
 
-    .cartao-curso-blender {
-        left: 29%;
-        top: 75%;
-    }
+  .secao-personagens {
+    height: 48vw;
+  }
 
-    .texto-formacao {
-        font-size: clamp(.65rem, 2.8vw, 1.1rem);
-    }
+  .legenda-personagens .conteudo-caixa {
+    font-size: 1.1vw;
+  }
 
-
-    /* SECÇÃO 05 — HABILIDADES */
-
-    .grade-habilidades {
-        left: 16%;
-        top: 9%;
-        width: 69%;
-        height: 72%;
-        grid-template-columns: minmax(0, 1fr);
-        gap: 1.5vh;
-    }
-
-    .etiqueta-programa {
-        max-height: 10vh;
-    }
-
-    .etiqueta-programa .conteudo-caixa {
-        font-size: clamp(.8rem, 3.2vw, 1.15rem);
-    }
-
-
-    /* SECÇÃO 06 — TRABALHOS */
-
-    .quadro-trabalhos {
-        left: 5%;
-        top: 26%;
-        width: 90%;
-    }
-
-
-    /* GALERIA */
-
-    .legenda .conteudo-caixa {
-        font-size: 1.3vw;
-    }
-
-
-    /* SECÇÃO 07 — CARTAZES */
-
-    .secao-cartazes {
-        height: 62vw;
-    }
-
-
-    /* SECÇÃO 08 — ILUSTRAÇÃO VETORIAL */
-
-    .secao-ilustracao-vetorial {
-        height: 60vw;
-    }
-
-
-    /* SECÇÃO 09 — PERSONAGENS */
-
-    .secao-personagens {
-        height: 48vw;
-    }
-
-    .legenda-personagens .conteudo-caixa {
-        font-size: 1.1vw;
-    }
-
-
-    /* SECÇÃO 10 — CENÁRIO */
-
-    .secao-cenario {
-        height: 51.5573vw;
-    }
+  .secao-cenario {
+    height: 51.5573vw;
+  }
 
 }
 
-
-/* ==============================================================
-   ACESSIBILIDADE
-   ============================================================== */
+/* ACESSIBILIDADE */
 
 @media (prefers-reduced-motion: reduce) {
-
-    html {
-        scroll-behavior: auto;
-    }
-
+  html {
+    scroll-behavior: auto;
+  }
 }

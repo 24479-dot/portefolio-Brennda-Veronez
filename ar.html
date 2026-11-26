@@ -11,23 +11,23 @@
 
     <title>Experiência AR | Brennda Veronez</title>
 
-    <link rel="stylesheet" href="./ar.css?v=30">
+    <link rel="stylesheet" href="./ar.css?v=32">
 
-    <link rel="stylesheet" href="./camara.css?v=30">
+    <link rel="stylesheet" href="./camara.css?v=32">
 
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-    <script defer src="./ar.js?v=30"></script>
+    <script defer src="./ar.js?v=32"></script>
 
-    <script defer src="./camara.js?v=30"></script>
+    <script defer src="./camara.js?v=32"></script>
 
 </head>
 
 <body>
 
-    <!-- ECRÃ INICIAL -->
+    <!-- ECRA INICIAL -->
 
     <div id="inicio-ar" class="ecra">
 
@@ -56,7 +56,7 @@
     </div>
 
 
-    <!-- ECRÃ DE CARREGAMENTO -->
+    <!-- ECRA DE CARREGAMENTO -->
 
     <div id="carregamento-ar"
          class="ecra"
@@ -107,7 +107,7 @@
     </div>
 
 
-    <!-- ECRÃ DE ERRO -->
+    <!-- ECRA DE ERRO -->
 
     <div id="erro-ar"
          class="ecra"
@@ -163,7 +163,7 @@
         </div>
 
 
-        <!-- BOTÃO CÂMARA -->
+        <!-- BOTAO CAMARA -->
 
         <button id="camera-abrir"
                 type="button"
@@ -172,7 +172,7 @@
         </button>
 
 
-        <!-- PAINEL DA CÂMARA -->
+        <!-- PAINEL DA CAMARA -->
 
         <div id="camera-painel" hidden>
 
@@ -299,7 +299,7 @@
     </div>
 
 
-    <!-- MINDAR V30 -->
+    <!-- MINDAR V32 -->
 
     <a-scene
 
@@ -354,7 +354,7 @@
         </a-entity>
 
 
-        <!-- OBJETO VIRTUAL COM TRACKING SUAVIZADO -->
+        <!-- ANCORA DINAMICA ESTABILIZADA -->
 
         <a-entity
 
@@ -363,15 +363,17 @@
             visible="false">
 
 
+            <!-- V32 - ENVELOPE VIRTUAL MAIOR -->
+
             <a-plane
 
                 id="animacao-envelope"
 
-                width="4.16"
+                width="4.60"
 
-                height="4.727273"
+                height="5.227273"
 
-                position="0 1.40 0.001"
+                position="0 1.548 0.001"
 
                 rotation="0 0 0"
 
@@ -548,13 +550,11 @@
                 estadoTarget
             ]) {
 
-                const texto =
-                    elemento.textContent.trim();
+                const texto = elemento.textContent.trim();
 
                 if (correcoes[texto]) {
 
-                    elemento.textContent =
-                        correcoes[texto];
+                    elemento.textContent = correcoes[texto];
 
                 }
 
