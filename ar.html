@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="pt">
 
@@ -11,9 +12,11 @@
 
     <title>Experiência AR | Brennda Veronez</title>
 
-    <link rel="stylesheet" href="ar.css?v=15">
+    <!-- FICHEIROS CSS -->
 
-    <link rel="stylesheet" href="camera.css?v=17">
+    <link rel="stylesheet" href="./ar.css?v=18">
+
+    <link rel="stylesheet" href="./camera.css?v=18">
 
     <!-- BIBLIOTECAS MINDAR -->
 
@@ -21,11 +24,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-    <!-- ANIMAÇÃO ORIGINAL -->
+    <!-- JAVASCRIPT -->
 
     <script defer src="ar.js?v=16"></script>
-
-    <!-- DIAGNÓSTICO DA CÂMARA -->
 
     <script defer src="camera.js?v=17"></script>
 
@@ -173,7 +174,7 @@
         </div>
 
 
-        <!-- BOTÃO DE CONFIGURAÇÕES -->
+        <!-- BOTÃO CÂMARA -->
 
         <button id="camera-abrir"
                 type="button"
@@ -203,7 +204,7 @@
             </div>
 
 
-            <!-- INFORMAÇÕES REAIS -->
+            <!-- INFORMAÇÕES DA CÂMARA -->
 
             <div class="camera-diagnostico">
 
@@ -245,7 +246,7 @@
             </div>
 
 
-            <!-- SELEÇÃO DA LENTE -->
+            <!-- SELEÇÃO DA CÂMARA -->
 
             <label for="camera-lista">
                 Selecionar câmara
@@ -321,7 +322,7 @@
                    disabled>
 
 
-            <!-- ATUALIZAR INFORMAÇÕES -->
+            <!-- ATUALIZAR DIAGNÓSTICO -->
 
             <button id="camera-atualizar"
                     type="button">
@@ -489,8 +490,6 @@
         window.addEventListener("error", event => {
 
             if (event.target?.tagName === "SCRIPT") {
-
-                // O diagnóstico é opcional.
 
                 if (
                     event.target.src.includes("camera.js")
