@@ -2,8 +2,8 @@
 "use strict";
 
 // ==================================================
-// V29 — MINDAR
-// CENTRALIZAÇÃO E ENQUADRAMENTO AUTOMÁTICO
+// V31 - MINDAR
+// TRACKING DINAMICO ESTABILIZADO
 // ==================================================
 
 const TOTAL_FRAMES = 220;
@@ -19,27 +19,25 @@ const INITIAL_BUFFER = 12;
 const BUFFER_SIZE = 24;
 const MAX_DOWNLOADS = 6;
 
-const TEMPO_ESTABILIZACAO = 300;
-const MIN_AMOSTRAS = 5;
-
 // ==================================================
-// CONFIGURAÇÃO DO ENQUADRAMENTO
+// CONFIGURACAO DA ESTABILIZACAO
 // ==================================================
 
-const MARGEM_LATERAL = 0.05;
-const MARGEM_SUPERIOR = 0.12;
-const MARGEM_INFERIOR = 0.05;
+const SUAVIZACAO_POSICAO = 0.12;
+const SUAVIZACAO_ROTACAO = 0.10;
+const SUAVIZACAO_ESCALA = 0.10;
+
+const ZONA_MORTA_POSICAO = 0.002;
+const ZONA_MORTA_ROTACAO = 0.006;
+const ZONA_MORTA_ESCALA = 0.003;
 
 let cameraPreparada = false;
 let experienciaIniciada = false;
 let carregamentoConcluido = false;
 let marcadorEncontrado = false;
-let posicaoBloqueada = false;
-
 let instanteReconhecimento = null;
 
 const $ = id => document.getElementById(id);
-
 
 // ==================================================
 // CARREGAMENTO
@@ -49,20 +47,16 @@ function atualizarProgresso(valor, mensagem) {
 
     valor = Math.max(0, Math.min(100, valor));
 
-    $("percentagem").textContent =
-        Math.round(valor) + "%";
+    $("percentagem").textContent = Math.round(valor) + "%";
 
-    $("barra-progresso").style.width =
-        valor + "%";
+    $("barra-progresso").style.width = valor + "%";
 
     $("circulo-progresso").style.strokeDashoffset =
         326.7256 * (1 - valor / 100);
 
-    $("texto-carregamento").textContent =
-        mensagem;
+    $("texto-carregamento").textContent = mensagem;
 
 }
-
 
 function verificarCarregamento() {
 
@@ -83,9 +77,7 @@ function verificarCarregamento() {
     for (let i = 1; i <= INITIAL_BUFFER; i++) {
 
         if (componente.frames.get(i)?.ready) {
-
             prontos++;
-
         }
 
     }
@@ -96,13 +88,10 @@ function verificarCarregamento() {
         29 * prontos / INITIAL_BUFFER;
 
     atualizarProgresso(
-
         progresso,
-
         cameraPreparada
             ? "A preparar a animação..."
             : "A iniciar a câmara..."
-
     );
 
     if (
@@ -123,18 +112,15 @@ function verificarCarregamento() {
         $("carregamento-ar").hidden = true;
 
         if (marcadorEncontrado) {
-
-            componente.prepararBloqueio();
-
+            componente.startAnimation();
         }
 
     }
 
 }
 
-
 // ==================================================
-// CAMINHO DOS FRAMES PNG
+// CAMINHO DOS FRAMES
 // ==================================================
 
 function framePath(number) {
@@ -146,9 +132,8 @@ function framePath(number) {
 
 }
 
-
 // ==================================================
-// CONFIGURAÇÃO DA CÂMARA
+// CONFIGURACAO DA CAMARA
 // ==================================================
 
 async function configurarFoco(scene) {
@@ -174,21 +159,17 @@ async function configurarFoco(scene) {
             capacidades.focusMode?.includes("continuous")
         ) {
 
-            const atuais =
-                track.getConstraints();
+            const atuais = track.getConstraints();
 
             await track.applyConstraints({
 
                 ...atuais,
 
                 advanced: [
-
                     ...(atuais.advanced || []),
-
                     {
                         focusMode: "continuous"
                     }
-
                 ]
 
             });
@@ -196,14 +177,14 @@ async function configurarFoco(scene) {
         }
 
         console.log(
-            "V29 — Câmara:",
+            "V31 - Camara:",
             track.getSettings()
         );
 
     } catch (erro) {
 
         console.warn(
-            "Ajuste de foco indisponível.",
+            "Foco automatico indisponivel.",
             erro
         );
 
@@ -211,136 +192,8 @@ async function configurarFoco(scene) {
 
 }
 
-
 // ==================================================
-// ENQUADRAMENTO AUTOMÁTICO
-// ==================================================
-
-function ajustarEnquadramento(larguraOriginal) {
-
-    const viewport = window.visualViewport;
-
-    const larguraEcra =
-        viewport?.width || window.innerWidth;
-
-    const alturaEcra =
-        viewport?.height || window.innerHeight;
-
-    const offsetX =
-        viewport?.offsetLeft || 0;
-
-    const offsetY =
-        viewport?.offsetTop || 0;
-
-    const proporcao =
-        CANVAS_WIDTH / CANVAS_HEIGHT;
-
-
-    // Margens de segurança.
-
-    const margemX =
-        larguraEcra * MARGEM_LATERAL;
-
-    let margemTopo =
-        alturaEcra * MARGEM_SUPERIOR;
-
-    const margemFundo =
-        alturaEcra * MARGEM_INFERIOR;
-
-
-    // Evitar sobreposição com os botões superiores.
-
-    const botaoVoltar =
-        document.querySelector(".voltar");
-
-    const botaoCamera =
-        $("camera-abrir");
-
-    for (const botao of [botaoVoltar, botaoCamera]) {
-
-        if (!botao || botao.hidden) continue;
-
-        const rect =
-            botao.getBoundingClientRect();
-
-        margemTopo = Math.max(
-
-            margemTopo,
-
-            rect.bottom - offsetY + 12
-
-        );
-
-    }
-
-
-    // Área disponível para toda a animação.
-
-    const larguraDisponivel =
-        Math.max(1, larguraEcra - margemX * 2);
-
-    const alturaDisponivel =
-        Math.max(
-
-            1,
-
-            alturaEcra -
-            margemTopo -
-            margemFundo
-
-        );
-
-
-    // Reduzir apenas quando necessário.
-    // Preservar sempre a proporção original.
-
-    const larguraFinal =
-        Math.min(
-
-            larguraOriginal,
-
-            larguraDisponivel,
-
-            alturaDisponivel * proporcao
-
-        );
-
-    const alturaFinal =
-        larguraFinal / proporcao;
-
-
-    // Centralização horizontal.
-
-    const esquerda =
-        offsetX +
-        (larguraEcra - larguraFinal) / 2;
-
-
-    // Centralização vertical dentro da área útil.
-
-    const topo =
-        offsetY +
-        margemTopo +
-        (alturaDisponivel - alturaFinal) / 2;
-
-
-    return {
-
-        left: esquerda,
-
-        top: topo,
-
-        width: larguraFinal,
-
-        height: alturaFinal
-
-    };
-
-}
-
-
-// ==================================================
-// COMPONENTE DA ANIMAÇÃO
+// COMPONENTE DA ANIMACAO
 // ==================================================
 
 if (!window.AFRAME) {
@@ -355,6 +208,8 @@ if (!window.AFRAME) {
 
         init: function () {
 
+            const THREE = AFRAME.THREE;
+
             this.frames = new Map();
 
             this.downloadsAtivos = 0;
@@ -362,64 +217,105 @@ if (!window.AFRAME) {
             this.janelaPretendida = new Set();
 
             this.playing = false;
-
-            this.aEstabilizar = false;
-
-            this.amostras = [];
-
-            this.inicioEstabilizacao = null;
-
-            this.ultimoTempoAmostra = 0;
+            this.removido = false;
+            this.trackingInicializado = false;
 
             this.tempoInicial = null;
-
             this.ultimoFrameDesenhado = null;
-
             this.ultimoFramePedido = null;
 
-            this.camada = null;
+            // Variaveis de tracking.
 
-            this.removido = false;
+            this.posicaoAtual = new THREE.Vector3();
 
+            this.rotacaoAtual = new THREE.Quaternion();
+
+            this.escalaAtual = new THREE.Vector3(1, 1, 1);
+
+            this.posicaoTarget = new THREE.Vector3();
+
+            this.rotacaoTarget = new THREE.Quaternion();
+
+            this.escalaTarget = new THREE.Vector3();
+
+            this.matrizLocal = new THREE.Matrix4();
+
+            this.matrizInversa = new THREE.Matrix4();
+
+            this.diferencaEscala = new THREE.Vector3();
 
             // Canvas transparente.
 
-            this.canvas =
-                document.createElement("canvas");
+            this.canvas = document.createElement("canvas");
 
-            this.canvas.width =
-                CANVAS_WIDTH;
+            this.canvas.width = CANVAS_WIDTH;
 
-            this.canvas.height =
-                CANVAS_HEIGHT;
+            this.canvas.height = CANVAS_HEIGHT;
 
-            this.ctx =
-                this.canvas.getContext("2d", {
-
-                    alpha: true
-
-                });
+            this.ctx = this.canvas.getContext("2d", {
+                alpha: true
+            });
 
             this.ctx.imageSmoothingEnabled = true;
 
             this.ctx.imageSmoothingQuality = "medium";
 
+            // Textura da animacao.
 
-            this.el.setAttribute(
-                "visible",
-                false
+            this.texture = new THREE.CanvasTexture(
+                this.canvas
             );
 
+            this.texture.colorSpace =
+                THREE.SRGBColorSpace;
 
-            // Pré-carregamento imediato.
+            this.texture.generateMipmaps = false;
 
-            this.preloadFrames(
-                1,
-                INITIAL_BUFFER
+            this.texture.minFilter = THREE.LinearFilter;
+
+            this.texture.magFilter = THREE.LinearFilter;
+
+            this.material = new THREE.MeshBasicMaterial({
+
+                map: this.texture,
+
+                transparent: true,
+
+                depthWrite: false,
+
+                side: THREE.DoubleSide
+
+            });
+
+            this.applyMaterial = () => {
+
+                const mesh = this.el.getObject3D("mesh");
+
+                if (
+                    mesh &&
+                    mesh.material !== this.material
+                ) {
+
+                    mesh.material = this.material;
+
+                }
+
+            };
+
+            this.el.addEventListener(
+                "object3dset",
+                this.applyMaterial
             );
+
+            this.applyMaterial();
+
+            this.el.setAttribute("visible", false);
+
+            // Pre-carregamento inicial.
+
+            this.preloadFrames(1, INITIAL_BUFFER);
 
         },
-
 
         // ==========================================
         // CARREGAR FRAME
@@ -439,14 +335,12 @@ if (!window.AFRAME) {
             image.decoding = "async";
 
             if (number === 1) {
-
                 image.fetchPriority = "high";
-
             }
 
             const frame = {
 
-                image,
+                image: image,
 
                 ready: false,
 
@@ -459,7 +353,6 @@ if (!window.AFRAME) {
             this.frames.set(number, frame);
 
             this.downloadsAtivos++;
-
 
             image.onload = () => {
 
@@ -485,7 +378,6 @@ if (!window.AFRAME) {
 
             };
 
-
             image.onerror = () => {
 
                 this.downloadsAtivos--;
@@ -497,7 +389,7 @@ if (!window.AFRAME) {
                 if (this.removido) return;
 
                 console.warn(
-                    "Frame indisponível:",
+                    "Frame indisponivel:",
                     number
                 );
 
@@ -507,7 +399,7 @@ if (!window.AFRAME) {
                 ) {
 
                     window.mostrarErroAR(
-                        "Não foi possível carregar a primeira imagem da animação."
+                        "Não foi possível carregar a primeira imagem."
                     );
 
                     return;
@@ -518,14 +410,12 @@ if (!window.AFRAME) {
 
             };
 
-
             image.src = framePath(number);
 
         },
 
-
         // ==========================================
-        // DOWNLOADS SIMULTÂNEOS
+        // GESTAO DOS DOWNLOADS
         // ==========================================
 
         processarDownloads: function () {
@@ -553,9 +443,8 @@ if (!window.AFRAME) {
 
         },
 
-
         // ==========================================
-        // PRÉ-CARREGAMENTO
+        // PRE-CARREGAMENTO
         // ==========================================
 
         preloadFrames: function (
@@ -597,15 +486,13 @@ if (!window.AFRAME) {
 
         },
 
-
         // ==========================================
         // DESENHAR FRAME
         // ==========================================
 
         drawFrame: function (number) {
 
-            const frame =
-                this.frames.get(number);
+            const frame = this.frames.get(number);
 
             if (!frame?.ready) return false;
 
@@ -618,25 +505,21 @@ if (!window.AFRAME) {
             }
 
             this.ctx.clearRect(
-
                 0,
                 0,
                 CANVAS_WIDTH,
                 CANVAS_HEIGHT
-
             );
 
             this.ctx.drawImage(
-
                 frame.image,
-
                 0,
                 0,
-
                 CANVAS_WIDTH,
                 CANVAS_HEIGHT
-
             );
+
+            this.texture.needsUpdate = true;
 
             this.ultimoFrameDesenhado = number;
 
@@ -644,461 +527,212 @@ if (!window.AFRAME) {
 
         },
 
-
         // ==========================================
-        // CRIAR CAMADA FIXA E CENTRALIZADA
-        // ==========================================
-
-        criarCamada: function (rect) {
-
-            this.camada?.remove();
-
-            const camada =
-                document.createElement("div");
-
-            camada.id =
-                "animacao-fixa-v29";
-
-            Object.assign(camada.style, {
-
-                position: "fixed",
-
-                left: rect.left + "px",
-
-                top: rect.top + "px",
-
-                width: rect.width + "px",
-
-                height: rect.height + "px",
-
-                transform: "none",
-
-                transformOrigin: "center center",
-
-                pointerEvents: "none",
-
-                background: "transparent",
-
-                overflow: "visible",
-
-                zIndex: "5",
-
-                opacity: "1",
-
-                transition: "none",
-
-                animation: "none",
-
-                margin: "0",
-
-                padding: "0",
-
-                boxSizing: "border-box"
-
-            });
-
-
-            Object.assign(this.canvas.style, {
-
-                display: "block",
-
-                width: "100%",
-
-                height: "100%",
-
-                maxWidth: "100%",
-
-                maxHeight: "100%",
-
-                objectFit: "contain",
-
-                background: "transparent",
-
-                pointerEvents: "none",
-
-                transform: "none"
-
-            });
-
-
-            camada.appendChild(this.canvas);
-
-            document.body.appendChild(camada);
-
-            this.camada = camada;
-
-        },
-
-
-        // ==========================================
-        // PREPARAR ESTABILIZAÇÃO
+        // TRACKING DINAMICO ESTABILIZADO
         // ==========================================
 
-        prepararBloqueio: function () {
+        atualizarTracking: function (delta) {
 
-            if (
-                posicaoBloqueada ||
-                this.aEstabilizar ||
-                window.arFalhou
-            ) return;
+            if (!marcadorEncontrado) return false;
 
-            this.aEstabilizar = true;
+            const marcador = $("marcador");
 
-            this.amostras = [];
+            const ancora = $("ancora-suavizada");
 
-            this.inicioEstabilizacao = null;
+            if (!marcador || !ancora) return false;
 
-            this.ultimoTempoAmostra = 0;
+            const origem = marcador.object3D;
 
-            this.preloadFrames(
-                1,
-                BUFFER_SIZE
+            const destino = ancora.object3D;
+
+            origem.updateWorldMatrix(true, false);
+
+            if (destino.parent) {
+
+                destino.parent.updateWorldMatrix(
+                    true,
+                    false
+                );
+
+                this.matrizInversa
+                    .copy(destino.parent.matrixWorld)
+                    .invert();
+
+                this.matrizLocal.multiplyMatrices(
+                    this.matrizInversa,
+                    origem.matrixWorld
+                );
+
+            } else {
+
+                this.matrizLocal.copy(
+                    origem.matrixWorld
+                );
+
+            }
+
+            this.matrizLocal.decompose(
+
+                this.posicaoTarget,
+
+                this.rotacaoTarget,
+
+                this.escalaTarget
+
             );
 
-        },
+            const valoresValidos = [
 
+                this.posicaoTarget.x,
+                this.posicaoTarget.y,
+                this.posicaoTarget.z,
 
-        cancelarBloqueio: function () {
+                this.rotacaoTarget.x,
+                this.rotacaoTarget.y,
+                this.rotacaoTarget.z,
+                this.rotacaoTarget.w,
 
-            if (posicaoBloqueada) return;
+                this.escalaTarget.x,
+                this.escalaTarget.y,
+                this.escalaTarget.z
 
-            this.aEstabilizar = false;
-
-            this.amostras = [];
-
-            this.inicioEstabilizacao = null;
-
-        },
-
-
-        // ==========================================
-        // CALCULAR DIMENSÕES ATRAVÉS DO MINDAR
-        // ==========================================
-
-        calcularPosicao: function () {
-
-            const THREE =
-                AFRAME.THREE;
-
-            const scene =
-                this.el.sceneEl;
-
-            const camera =
-                scene.camera;
-
-            const mesh =
-                this.el.getObject3D("mesh");
+            ].every(Number.isFinite);
 
             if (
-                !camera ||
-                !mesh ||
-                !scene.canvas
-            ) return null;
+                !valoresValidos ||
+                Math.abs(this.escalaTarget.x) < 0.000001
+            ) return false;
 
+            // Primeira deteccao.
 
-            camera.updateMatrixWorld(true);
+            if (!this.trackingInicializado) {
 
-            mesh.updateWorldMatrix(true, false);
-
-            const geometria =
-                mesh.geometry;
-
-            if (!geometria.boundingBox) {
-
-                geometria.computeBoundingBox();
-
-            }
-
-            const caixa =
-                geometria.boundingBox;
-
-            const centro =
-                caixa.getCenter(
-                    new THREE.Vector3()
+                this.posicaoAtual.copy(
+                    this.posicaoTarget
                 );
 
-            const esquerda =
-                new THREE.Vector3(
-
-                    caixa.min.x,
-                    centro.y,
-                    centro.z
-
+                this.rotacaoAtual.copy(
+                    this.rotacaoTarget
                 );
 
-            const direita =
-                new THREE.Vector3(
-
-                    caixa.max.x,
-                    centro.y,
-                    centro.z
-
+                this.escalaAtual.copy(
+                    this.escalaTarget
                 );
 
-            const superior =
-                new THREE.Vector3(
+                this.trackingInicializado = true;
 
-                    centro.x,
-                    caixa.max.y,
-                    centro.z
+            } else {
 
+                // Suavizacao independente dos FPS.
+
+                const dt = Math.max(
+                    1,
+                    Math.min(delta || 16.67, 100)
                 );
 
-            const inferior =
-                new THREE.Vector3(
-
-                    centro.x,
-                    caixa.min.y,
-                    centro.z
-
-                );
-
-            const canvasRect =
-                scene.canvas.getBoundingClientRect();
-
-
-            function projetar(ponto) {
-
-                ponto.applyMatrix4(
-                    mesh.matrixWorld
-                );
-
-                ponto.project(camera);
-
-                return {
-
-                    x:
-                        canvasRect.left +
-
-                        (ponto.x + 1) *
-                        canvasRect.width / 2,
-
-                    y:
-                        canvasRect.top +
-
-                        (1 - ponto.y) *
-                        canvasRect.height / 2
-
-                };
-
-            }
-
-
-            const c = projetar(centro);
-
-            const e = projetar(esquerda);
-
-            const d = projetar(direita);
-
-            const s = projetar(superior);
-
-            const i = projetar(inferior);
-
-
-            const larguraProjetada =
-                Math.hypot(
-
-                    d.x - e.x,
-
-                    d.y - e.y
-
-                );
-
-
-            const alturaProjetada =
-                Math.hypot(
-
-                    i.x - s.x,
-
-                    i.y - s.y
-
-                );
-
-
-            const proporcao =
-                CANVAS_WIDTH / CANVAS_HEIGHT;
-
-            const largura =
-                Math.min(
-
-                    larguraProjetada,
-
-                    alturaProjetada * proporcao
-
-                );
-
-            const altura =
-                largura / proporcao;
-
-
-            if (
-
-                !Number.isFinite(c.x) ||
-
-                !Number.isFinite(c.y) ||
-
-                !Number.isFinite(largura) ||
-
-                !Number.isFinite(altura) ||
-
-                largura < 10 ||
-
-                altura < 10 ||
-
-                largura > window.innerWidth * 5
-
-            ) return null;
-
-
-            return {
-
-                centerX: c.x,
-
-                centerY: c.y,
-
-                width: largura,
-
-                height: altura
-
-            };
-
-        },
-
-
-        // ==========================================
-        // RECOLHER AMOSTRAS
-        // ==========================================
-
-        recolherPosicao: function (time) {
-
-            if (
-                !marcadorEncontrado ||
-                !this.aEstabilizar
-            ) return;
-
-            if (
-                time - this.ultimoTempoAmostra < 40
-            ) return;
-
-            this.ultimoTempoAmostra = time;
-
-            const posicao =
-                this.calcularPosicao();
-
-            if (!posicao) return;
-
-            if (
-                this.inicioEstabilizacao === null
-            ) {
-
-                this.inicioEstabilizacao = time;
-
-            }
-
-            this.amostras.push(posicao);
-
-            if (
-                this.amostras.length > 12
-            ) {
-
-                this.amostras.shift();
-
-            }
-
-            if (
-
-                this.amostras.length >= MIN_AMOSTRAS &&
-
-                time - this.inicioEstabilizacao
-                    >= TEMPO_ESTABILIZACAO
-
-            ) {
-
-                this.bloquearPosicao();
-
-            }
-
-        },
-
-
-        // ==========================================
-        // CENTRALIZAR E BLOQUEAR A ANIMAÇÃO
-        // ==========================================
-
-        bloquearPosicao: function () {
-
-            if (
-
-                posicaoBloqueada ||
-
-                !this.amostras.length ||
-
-                !this.frames.get(1)?.ready
-
-            ) return;
-
-
-            function mediana(valores) {
-
-                const ordenados =
-                    [...valores].sort(
-                        (a, b) => a - b
+                const fatorPosicao =
+                    1 - Math.pow(
+                        1 - SUAVIZACAO_POSICAO,
+                        dt / 16.67
                     );
 
-                const meio =
-                    Math.floor(
-                        ordenados.length / 2
+                const fatorRotacao =
+                    1 - Math.pow(
+                        1 - SUAVIZACAO_ROTACAO,
+                        dt / 16.67
                     );
 
-                if (ordenados.length % 2) {
+                const fatorEscala =
+                    1 - Math.pow(
+                        1 - SUAVIZACAO_ESCALA,
+                        dt / 16.67
+                    );
 
-                    return ordenados[meio];
+                // Reduzir vibracoes de posicao.
+
+                if (
+                    this.posicaoAtual.distanceTo(
+                        this.posicaoTarget
+                    ) > ZONA_MORTA_POSICAO
+                ) {
+
+                    this.posicaoAtual.lerp(
+                        this.posicaoTarget,
+                        fatorPosicao
+                    );
 
                 }
 
-                return (
+                // Reduzir vibracoes de rotacao.
 
-                    ordenados[meio - 1] +
+                if (
+                    this.rotacaoAtual.angleTo(
+                        this.rotacaoTarget
+                    ) > ZONA_MORTA_ROTACAO
+                ) {
 
-                    ordenados[meio]
+                    this.rotacaoAtual.slerp(
+                        this.rotacaoTarget,
+                        fatorRotacao
+                    );
 
-                ) / 2;
+                }
+
+                // Reduzir vibracoes de escala.
+
+                this.diferencaEscala
+                    .copy(this.escalaTarget)
+                    .sub(this.escalaAtual);
+
+                if (
+                    this.diferencaEscala.length() >
+                    ZONA_MORTA_ESCALA
+                ) {
+
+                    this.escalaAtual.lerp(
+                        this.escalaTarget,
+                        fatorEscala
+                    );
+
+                }
 
             }
 
+            destino.position.copy(
+                this.posicaoAtual
+            );
 
-            // Calcular a escala reconhecida pelo MindAR.
+            destino.quaternion.copy(
+                this.rotacaoAtual
+            );
 
-            const larguraOriginal =
-                mediana(
+            destino.scale.copy(
+                this.escalaAtual
+            );
 
-                    this.amostras.map(
-                        a => a.width
-                    )
+            destino.updateMatrix();
 
-                );
+            destino.matrixWorldNeedsUpdate = true;
 
+            return true;
 
-            // Ajustar automaticamente ao ecrã.
-            // Nenhuma parte do canvas ficará fora
-            // da área de segurança inicial.
+        },
 
-            const rect =
-                ajustarEnquadramento(
-                    larguraOriginal
-                );
+        // ==========================================
+        // INICIAR ANIMACAO
+        // ==========================================
 
+        startAnimation: function () {
 
-            this.drawFrame(1);
+            if (
+                this.playing ||
+                !marcadorEncontrado ||
+                !carregamentoConcluido ||
+                window.arFalhou ||
+                !this.frames.get(1)?.ready
+            ) return;
 
-            this.criarCamada(rect);
-
-
-            // Bloquear definitivamente.
-
-            posicaoBloqueada = true;
-
-            this.aEstabilizar = false;
+            this.trackingInicializado = false;
 
             this.playing = true;
 
@@ -1106,117 +740,132 @@ if (!window.AFRAME) {
 
             this.ultimoFramePedido = null;
 
+            this.ultimoFrameDesenhado = null;
+
+            this.preloadFrames(1);
+
+            this.drawFrame(1);
+
+        },
+
+        // ==========================================
+        // PARAR E OCULTAR ANIMACAO
+        // ==========================================
+
+        stopAnimation: function () {
+
+            this.playing = false;
+
+            this.trackingInicializado = false;
+
+            this.tempoInicial = null;
+
+            this.ultimoFramePedido = null;
+
+            this.ultimoFrameDesenhado = null;
+
             this.el.setAttribute(
                 "visible",
                 false
             );
 
-            document.body.classList.add(
-                "alvo-encontrado"
+            $("ancora-suavizada")?.setAttribute(
+                "visible",
+                false
             );
 
-            $("estado").textContent =
-                "Selo reconhecido!";
-
-
-            if (instanteReconhecimento !== null) {
-
-                const segundos =
-
-                    (
-                        performance.now() -
-                        instanteReconhecimento
-                    ) / 1000;
-
-                window.tempoArranqueAR =
-                    segundos;
-
-                console.log(
-
-                    "V29 — Tempo de arranque:",
-
-                    segundos.toFixed(2) + " segundos"
-
-                );
-
-            }
-
-
-            console.log(
-
-                "V29 — Enquadramento final:",
-
-                rect
-
+            this.preloadFrames(
+                1,
+                INITIAL_BUFFER
             );
 
         },
 
-
         // ==========================================
-        // REPRODUÇÃO A 25 FPS
+        // ATUALIZACAO EM TEMPO REAL
         // ==========================================
 
-        tick: function (time) {
+        tick: function (time, delta) {
 
-            if (window.arFalhou) {
+            const ancora = $("ancora-suavizada");
 
-                if (this.camada) {
+            const marcador = $("marcador");
 
-                    this.camada.hidden = true;
+            if (
+                window.arFalhou ||
+                !marcadorEncontrado ||
+                !marcador?.object3D.visible ||
+                !carregamentoConcluido ||
+                !this.playing
+            ) {
 
+                if (ancora) {
+                    ancora.object3D.visible = false;
                 }
 
                 return;
 
             }
 
-            if (
+            // Atualizar o tracking.
 
-                this.aEstabilizar &&
+            if (!this.atualizarTracking(delta)) {
 
-                carregamentoConcluido
+                if (ancora) {
+                    ancora.object3D.visible = false;
+                }
 
-            ) {
-
-                this.recolherPosicao(time);
+                return;
 
             }
 
-            if (
+            ancora.setAttribute("visible", true);
 
-                !this.playing ||
+            ancora.object3D.visible = true;
 
-                !posicaoBloqueada ||
-
-                !carregamentoConcluido
-
-            ) return;
-
+            this.el.setAttribute("visible", true);
 
             if (this.tempoInicial === null) {
 
                 this.tempoInicial = time;
 
+                document.body.classList.add(
+                    "alvo-encontrado"
+                );
+
+                $("estado").textContent =
+                    "Selo reconhecido!";
+
+                if (instanteReconhecimento !== null) {
+
+                    window.tempoArranqueAR = (
+                        performance.now() -
+                        instanteReconhecimento
+                    ) / 1000;
+
+                    console.log(
+                        "V31 - Tempo de arranque:",
+                        window.tempoArranqueAR.toFixed(2),
+                        "segundos"
+                    );
+
+                }
+
             }
+
+            // Reproducao a 25 FPS.
 
             const decorrido =
                 time - this.tempoInicial;
 
             const framePretendido =
-
                 Math.floor(
-
                     decorrido / FRAME_DURATION
-
                 ) % TOTAL_FRAMES + 1;
 
-
             if (
-
                 framePretendido !==
                 this.ultimoFramePedido
-
             ) {
 
                 this.ultimoFramePedido =
@@ -1228,12 +877,9 @@ if (!window.AFRAME) {
 
             }
 
-
             if (
-
                 framePretendido !==
                 this.ultimoFrameDesenhado
-
             ) {
 
                 this.drawFrame(
@@ -1242,12 +888,7 @@ if (!window.AFRAME) {
 
             }
 
-
-            // Não atualizar posição, rotação ou escala.
-            // A animação permanece fixa no ecrã.
-
         },
-
 
         // ==========================================
         // LIBERTAR RECURSOS
@@ -1259,9 +900,14 @@ if (!window.AFRAME) {
 
             this.playing = false;
 
-            this.aEstabilizar = false;
+            this.el.removeEventListener(
+                "object3dset",
+                this.applyMaterial
+            );
 
-            this.camada?.remove();
+            this.texture.dispose();
+
+            this.material.dispose();
 
             this.frames.clear();
 
@@ -1273,38 +919,48 @@ if (!window.AFRAME) {
 
 }
 
-
 // ==================================================
-// INICIALIZAÇÃO
+// INICIALIZACAO
 // ==================================================
 
 document.addEventListener("DOMContentLoaded", () => {
 
     if (!window.AFRAME) return;
 
-    const scene =
-        document.querySelector("a-scene");
+    const scene = document.querySelector("a-scene");
 
-    const marcador =
-        $("marcador");
+    const marcador = $("marcador");
 
-    const animacao =
-        $("animacao-envelope");
+    const ancora = $("ancora-suavizada");
 
-    const estado =
-        $("estado");
+    const animacao = $("animacao-envelope");
 
-    const botao =
-        $("iniciar-experiencia");
+    const estado = $("estado");
+
+    const botao = $("iniciar-experiencia");
+
+    if (
+        !scene ||
+        !marcador ||
+        !ancora ||
+        !animacao ||
+        !botao
+    ) {
+
+        window.mostrarErroAR(
+            "Verifica se o ficheiro ar.html corresponde à V30."
+        );
+
+        return;
+
+    }
 
     const componente = () =>
-
         animacao.components["sequencia-envelope"];
 
-
-// ==================================================
-// BOTÃO INICIAR
-// ==================================================
+    // ==============================================
+    // BOTAO INICIAR
+    // ==============================================
 
     botao.addEventListener("click", async () => {
 
@@ -1323,12 +979,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
-        if (
-            !navigator.mediaDevices?.getUserMedia
-        ) {
+        if (!navigator.mediaDevices?.getUserMedia) {
 
             window.mostrarErroAR(
-                "Este navegador não disponibiliza acesso à câmara."
+                "Este navegador não permite acesso à câmara."
             );
 
             return;
@@ -1344,11 +998,8 @@ document.addEventListener("DOMContentLoaded", () => {
         $("carregamento-ar").hidden = false;
 
         atualizarProgresso(
-
             0,
-
             "A iniciar a câmara..."
-
         );
 
         clearTimeout(window.limiteAR);
@@ -1365,7 +1016,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }, 90000);
 
-
         try {
 
             const sistema =
@@ -1374,13 +1024,12 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!sistema) {
 
                 throw new Error(
-                    "MindAR indisponível."
+                    "MindAR indisponivel."
                 );
 
             }
 
-            const arranque =
-                sistema.start();
+            const arranque = sistema.start();
 
             if (
                 componente().frames.get(1)?.failed
@@ -1391,11 +1040,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             componente().preloadFrames(
-
                 1,
-
                 INITIAL_BUFFER
-
             );
 
             verificarCarregamento();
@@ -1420,10 +1066,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-
-// ==================================================
-// MINDAR PREPARADO
-// ==================================================
+    // ==============================================
+    // MINDAR PREPARADO
+    // ==============================================
 
     scene.addEventListener("arReady", () => {
 
@@ -1449,62 +1094,57 @@ document.addEventListener("DOMContentLoaded", () => {
         configurarFoco(scene);
 
         componente()?.preloadFrames(
-
             1,
-
             BUFFER_SIZE
-
         );
 
         verificarCarregamento();
 
     });
 
-
-// ==================================================
-// SELO RECONHECIDO
-// ==================================================
+    // ==============================================
+    // TARGET RECONHECIDO
+    // ==============================================
 
     marcador.addEventListener("targetFound", () => {
 
-        if (window.arFalhou) return;
+        if (
+            window.arFalhou ||
+            marcadorEncontrado
+        ) return;
 
         marcadorEncontrado = true;
 
-        if (posicaoBloqueada) return;
-
-        instanteReconhecimento =
-            performance.now();
+        instanteReconhecimento = performance.now();
 
         estado.textContent =
-            "A preparar a animação...";
+            "Selo reconhecido!";
 
-        if (
+        if (carregamentoConcluido) {
 
-            carregamentoConcluido &&
-
-            $("carregamento-ar").hidden
-
-        ) {
-
-            componente()?.prepararBloqueio();
+            componente()?.startAnimation();
 
         }
 
     });
 
-
-// ==================================================
-// PERDA DO SELO
-// ==================================================
+    // ==============================================
+    // TARGET PERDIDO
+    // ==============================================
 
     marcador.addEventListener("targetLost", () => {
 
         marcadorEncontrado = false;
 
-        if (posicaoBloqueada) return;
+        instanteReconhecimento = null;
 
-        componente()?.cancelarBloqueio();
+        ancora.setAttribute("visible", false);
+
+        ancora.object3D.visible = false;
+
+        animacao.setAttribute("visible", false);
+
+        componente()?.stopAnimation();
 
         document.body.classList.remove(
             "alvo-encontrado"
@@ -1513,25 +1153,27 @@ document.addEventListener("DOMContentLoaded", () => {
         estado.textContent =
             "Volta a apontar para o selo dourado.";
 
-    });
-
-
-// ==================================================
-// ERRO MINDAR
-// ==================================================
-
-    scene.addEventListener("arError", () => {
-
-        window.mostrarErroAR(
-            "Não foi possível inicializar a câmara. Verifica as permissões."
+        console.log(
+            "V31 - Target perdido. Animacao ocultada."
         );
 
     });
 
+    // ==============================================
+    // ERRO MINDAR
+    // ==============================================
 
-// ==================================================
-// PRÉ-CARREGAMENTO
-// ==================================================
+    scene.addEventListener("arError", () => {
+
+        window.mostrarErroAR(
+            "Não foi possível inicializar a câmara."
+        );
+
+    });
+
+    // ==============================================
+    // PREPARAR EXPERIENCIA
+    // ==============================================
 
     function prepararBotao() {
 
@@ -1541,15 +1183,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         botao.disabled = false;
 
-        botao.textContent =
-            "Iniciar experiência";
+        botao.textContent = "Iniciar experiência";
 
         componente()?.preloadFrames(
-
             1,
-
             INITIAL_BUFFER
-
         );
 
     }
@@ -1561,22 +1199,22 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
 
         scene.addEventListener(
-
             "loaded",
-
             prepararBotao,
-
             { once: true }
-
         );
 
     }
 
-
-
-// LIBERTAR A CÂMARA
+    // ==============================================
+    // LIBERTAR CAMARA
+    // ==============================================
 
     window.addEventListener("pagehide", () => {
+
+        marcadorEncontrado = false;
+
+        componente()?.stopAnimation();
 
         try {
 
@@ -1586,13 +1224,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (erro) {}
 
-        document.querySelectorAll("video")
-            .forEach(video => {
+        document.querySelectorAll("video").forEach(video => {
 
-                video.srcObject?.getTracks()
-                    .forEach(track => track.stop());
+            video.srcObject?.getTracks().forEach(track => {
+
+                track.stop();
 
             });
+
+        });
 
     });
 

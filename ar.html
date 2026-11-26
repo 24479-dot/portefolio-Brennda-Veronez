@@ -11,31 +11,23 @@
 
     <title>Experiência AR | Brennda Veronez</title>
 
-    <!-- FICHEIROS CSS -->
+    <link rel="stylesheet" href="./ar.css?v=30">
 
-    <link rel="stylesheet" href="./ar.css?v=25">
-
-    <link rel="stylesheet" href="./camara.css?v=25">
-
-    <!-- BIBLIOTECAS MINDAR -->
+    <link rel="stylesheet" href="./camara.css?v=30">
 
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-    <!-- JAVASCRIPT -->
+    <script defer src="./ar.js?v=30"></script>
 
-    <script defer src="./ar.js?v=25"></script>
-
-    <script defer src="./camara.js?v=20"></script>
+    <script defer src="./camara.js?v=30"></script>
 
 </head>
 
 <body>
 
-    <!-- ======================================
-         ECRÃ INICIAL
-    ======================================= -->
+    <!-- ECRÃ INICIAL -->
 
     <div id="inicio-ar" class="ecra">
 
@@ -51,9 +43,7 @@
             <button id="iniciar-experiencia"
                     type="button"
                     disabled>
-
                 A preparar...
-
             </button>
 
             <p class="nota">
@@ -66,9 +56,7 @@
     </div>
 
 
-    <!-- ======================================
-         ECRÃ DE CARREGAMENTO
-    ======================================= -->
+    <!-- ECRÃ DE CARREGAMENTO -->
 
     <div id="carregamento-ar"
          class="ecra"
@@ -119,9 +107,7 @@
     </div>
 
 
-    <!-- ======================================
-         ECRÃ DE ERRO
-    ======================================= -->
+    <!-- ECRÃ DE ERRO -->
 
     <div id="erro-ar"
          class="ecra"
@@ -146,9 +132,7 @@
 
             <button id="tentar-novamente"
                     type="button">
-
                 Tentar novamente
-
             </button>
 
             <a class="regresso" href="index.html">
@@ -160,9 +144,7 @@
     </div>
 
 
-    <!-- ======================================
-         INTERFACE AR
-    ======================================= -->
+    <!-- INTERFACE AR -->
 
     <div id="interface-ar">
 
@@ -186,15 +168,11 @@
         <button id="camera-abrir"
                 type="button"
                 hidden>
-
             Câmara
-
         </button>
 
 
-        <!-- ======================================
-             PAINEL DE DIAGNÓSTICO
-        ======================================= -->
+        <!-- PAINEL DA CÂMARA -->
 
         <div id="camera-painel" hidden>
 
@@ -205,15 +183,10 @@
                 <button id="camera-fechar"
                         type="button"
                         aria-label="Fechar configurações">
-
                     ×
-
                 </button>
 
             </div>
-
-
-            <!-- INFORMAÇÕES DA CÂMARA -->
 
             <div class="camera-diagnostico">
 
@@ -255,48 +228,30 @@
             </div>
 
 
-            <!-- SELEÇÃO DA CÂMARA -->
-
             <label for="camera-lista">
                 Selecionar câmara
             </label>
 
             <select id="camera-lista"></select>
 
-            <button id="camera-trocar"
-                    type="button">
-
+            <button id="camera-trocar" type="button">
                 Usar esta câmara
-
             </button>
 
-
-            <!-- FOCAGEM -->
-
-            <button id="camera-foco"
-                    type="button">
-
+            <button id="camera-foco" type="button">
                 Ativar foco contínuo
-
             </button>
 
             <label class="camera-checkbox">
 
-                <input id="camera-toque"
-                       type="checkbox">
+                <input id="camera-toque" type="checkbox">
 
                 Focar ao tocar no ecrã
 
             </label>
 
-
-            <!-- EXPOSIÇÃO -->
-
-            <button id="camera-exposicao-auto"
-                    type="button">
-
+            <button id="camera-exposicao-auto" type="button">
                 Ativar exposição automática
-
             </button>
 
             <div class="camera-slider-titulo">
@@ -313,9 +268,6 @@
                    type="range"
                    disabled>
 
-
-            <!-- ZOOM -->
-
             <div class="camera-slider-titulo">
 
                 <label for="camera-zoom">
@@ -330,21 +282,14 @@
                    type="range"
                    disabled>
 
-
-            <!-- ATUALIZAR DIAGNÓSTICO -->
-
             <button id="camera-atualizar"
                     type="button">
-
                 Atualizar diagnóstico
-
             </button>
 
             <p id="camera-mensagem"
                aria-live="polite">
-
                 A consultar as capacidades da câmara...
-
             </p>
 
         </div>
@@ -354,10 +299,7 @@
     </div>
 
 
-    <!-- ======================================
-         MINDAR V25
-         CALIBRAÇÃO DO TAMANHO DO ENVELOPE
-    ======================================= -->
+    <!-- MINDAR V30 -->
 
     <a-scene
 
@@ -366,11 +308,11 @@
             autoStart: false;
             maxTrack: 1;
 
-            filterMinCF: 0.0001;
-            filterBeta: 10;
+            filterMinCF: 0.001;
+            filterBeta: 100;
 
-            warmupTolerance: 5;
-            missTolerance: 20;
+            warmupTolerance: 3;
+            missTolerance: 2;
 
             uiLoading: no;
             uiScanning: no;
@@ -381,7 +323,6 @@
 
         renderer="
             colorManagement: true;
-            physicallyCorrectLights: true;
             alpha: true;
             antialias: false;
         "
@@ -393,9 +334,6 @@
         embedded
     >
 
-
-        <!-- CÂMARA -->
-
         <a-camera
 
             position="0 0 0"
@@ -405,7 +343,7 @@
         </a-camera>
 
 
-        <!-- TARGET DO SELO DOURADO -->
+        <!-- MARCADOR MINDAR -->
 
         <a-entity
 
@@ -413,16 +351,17 @@
 
             mindar-image-target="targetIndex: 0">
 
+        </a-entity>
 
-            <!-- ==================================
-                 PLANO DE REFERÊNCIA V25
 
-                 Dimensões ajustadas à área visível
-                 do envelope original.
+        <!-- OBJETO VIRTUAL COM TRACKING SUAVIZADO -->
 
-                 A camada 2D do ar.js V24 utiliza
-                 estas dimensões para se posicionar.
-            =================================== -->
+        <a-entity
+
+            id="ancora-suavizada"
+
+            visible="false">
+
 
             <a-plane
 
@@ -432,7 +371,7 @@
 
                 height="4.727273"
 
-                position="-0.079 1.725 0.001"
+                position="0 1.40 0.001"
 
                 rotation="0 0 0"
 
@@ -454,9 +393,7 @@
     </a-scene>
 
 
-    <!-- ======================================
-         CONTROLO DE ERROS
-    ======================================= -->
+    <!-- CONTROLO DE ERROS -->
 
     <script>
 
@@ -473,26 +410,25 @@
 
             clearTimeout(window.limiteAR);
 
-
             document.getElementById(
                 "inicio-ar"
             ).hidden = true;
-
 
             document.getElementById(
                 "carregamento-ar"
             ).hidden = true;
 
-
             document.getElementById(
                 "erro-ar"
             ).hidden = false;
-
 
             document.getElementById(
                 "mensagem-erro"
             ).textContent = mensagem;
 
+            document.getElementById(
+                "ancora-suavizada"
+            ).setAttribute("visible", false);
 
             try {
 
@@ -501,7 +437,6 @@
                     .stop();
 
             } catch (e) {}
-
 
             document.querySelectorAll("video")
                 .forEach(video => {
@@ -555,15 +490,13 @@
             ) {
 
                 window.mostrarErroAR(
-                    "Os recursos da experiência demoraram demasiado tempo a carregar."
+                    "Os recursos demoraram demasiado tempo a carregar."
                 );
 
             }
 
         }, 90000);
 
-
-        // VERIFICAR BIBLIOTECAS
 
         if (!window.AFRAME) {
 
@@ -582,13 +515,12 @@
         }
 
 
-        // ATUALIZAR INSTRUÇÕES PARA O SELO
-
         const estadoAR =
             document.getElementById("estado");
 
         const estadoTarget =
             document.getElementById("diag-target");
+
 
         const observador = new MutationObserver(() => {
 
@@ -630,7 +562,6 @@
 
         });
 
-
         observador.observe(estadoAR, {
 
             childList: true,
@@ -638,7 +569,6 @@
             subtree: true
 
         });
-
 
         observador.observe(estadoTarget, {
 
