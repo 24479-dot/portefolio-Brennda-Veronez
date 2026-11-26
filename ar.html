@@ -11,31 +11,27 @@
 
     <title>Experiência AR | Brennda Veronez</title>
 
-
     <!-- FICHEIROS CSS -->
 
-    <link rel="stylesheet" href="./ar.css?v=21">
+    <link rel="stylesheet" href="./ar.css?v=25">
 
-    <link rel="stylesheet" href="./camara.css?v=21">
+    <link rel="stylesheet" href="./camara.css?v=25">
 
-
-    <!-- BIBLIOTECAS -->
+    <!-- BIBLIOTECAS MINDAR -->
 
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-
     <!-- JAVASCRIPT -->
 
-    <script defer src="./ar.js?v=20"></script>
+    <script defer src="./ar.js?v=25"></script>
 
     <script defer src="./camara.js?v=20"></script>
 
 </head>
 
 <body>
-
 
     <!-- ======================================
          ECRÃ INICIAL
@@ -359,8 +355,8 @@
 
 
     <!-- ======================================
-         MINDAR V21
-         ESTABILIZAÇÃO DO TRACKING
+         MINDAR V25
+         CALIBRAÇÃO DO TAMANHO DO ENVELOPE
     ======================================= -->
 
     <a-scene
@@ -418,17 +414,25 @@
             mindar-image-target="targetIndex: 0">
 
 
-            <!-- ANIMAÇÃO DO ENVELOPE -->
+            <!-- ==================================
+                 PLANO DE REFERÊNCIA V25
+
+                 Dimensões ajustadas à área visível
+                 do envelope original.
+
+                 A camada 2D do ar.js V24 utiliza
+                 estas dimensões para se posicionar.
+            =================================== -->
 
             <a-plane
 
                 id="animacao-envelope"
 
-                width="4.87"
+                width="4.16"
 
-                height="5.534091"
+                height="4.727273"
 
-                position="-0.09 2.00 0.001"
+                position="-0.079 1.725 0.001"
 
                 rotation="0 0 0"
 
