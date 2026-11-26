@@ -264,7 +264,8 @@ main {
 
 /* ==============================================================
    SECÇÃO 02 — CARTA
-   ENVELOPE REDUZIDO E SELO AUMENTADO PARA MINDAR
+   V22 — ENVELOPE MAIS PEQUENO
+   SELO COM DIMENSÃO ABSOLUTA PRESERVADA
    ============================================================== */
 
 .composicao-carta {
@@ -273,7 +274,7 @@ main {
     left: 50%;
     top: 50%;
 
-    width: 76%;
+    width: 65%;
 
     aspect-ratio: 1405 / 733;
 
@@ -308,7 +309,7 @@ main {
     left: 50% !important;
     top: 76% !important;
 
-    width: 25% !important;
+    width: 29.2307692308% !important;
     max-width: none !important;
 
     height: auto !important;
@@ -660,12 +661,13 @@ main {
     }
 
 
-    /* SECÇÃO 02 — CARTA */
+    /* SECÇÃO 02 — CARTA V22 */
 
     .composicao-carta {
         left: 50%;
         top: 50%;
-        width: 84%;
+
+        width: 72%;
 
         transform: translate(-50%, -50%);
     }
@@ -675,7 +677,7 @@ main {
         left: 50% !important;
         top: 76% !important;
 
-        width: 25% !important;
+        width: 29.1666666667% !important;
         max-width: none !important;
 
         height: auto !important;
