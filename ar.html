@@ -9,27 +9,64 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>Experiência AR | Portefólio</title>
+    <title>Experiência AR | Brennda Veronez</title>
 
-    <link rel="stylesheet" href="ar.css?v=13">
+    <link rel="stylesheet" href="ar.css?v=14">
 
-    <script defer src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script defer
+        src="https://aframe.io/releases/1.5.0/aframe.min.js">
+    </script>
 
-    <script defer src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script defer
+        src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js">
+    </script>
 
-    <script defer src="ar.js?v=13"></script>
+    <script defer src="ar.js?v=14"></script>
 
 </head>
 
 <body>
 
+    <!-- ECRÃ INICIAL -->
+
+    <div id="inicio-ar" class="ecra">
+
+        <div class="conteudo">
+
+            <h1>Experiência AR</h1>
+
+            <p>
+                Descobre o que se esconde
+                dentro do envelope.
+            </p>
+
+            <button id="iniciar-experiencia"
+                    type="button"
+                    disabled>
+
+                A preparar...
+
+            </button>
+
+            <p class="nota">
+                Permite o acesso à câmara
+                do teu dispositivo.
+            </p>
+
+        </div>
+
+    </div>
+
+
     <!-- ECRÃ DE CARREGAMENTO -->
 
     <div id="carregamento-ar"
+         class="ecra"
          role="status"
-         aria-live="polite">
+         aria-live="polite"
+         hidden>
 
-        <div class="conteudo-carregamento">
+        <div class="conteudo">
 
             <div class="circulo-carregamento">
 
@@ -64,7 +101,7 @@
             </div>
 
             <p id="texto-carregamento">
-                A iniciar...
+                A iniciar a câmara...
             </p>
 
         </div>
@@ -74,20 +111,19 @@
 
     <!-- ECRÃ DE ERRO -->
 
-    <div id="erro-ar" hidden role="alert">
+    <div id="erro-ar"
+         class="ecra"
+         role="alert"
+         hidden>
 
-        <div class="conteudo-carregamento">
+        <div class="conteudo">
 
-            <div class="simbolo-erro"
-                 aria-hidden="true">
-                !
-            </div>
+            <div class="simbolo-erro">!</div>
 
             <h2>Ocorreu um erro</h2>
 
             <p id="mensagem-erro">
-                Não foi possível iniciar a experiência
-                de realidade aumentada.
+                Não foi possível iniciar a experiência.
             </p>
 
             <p>
@@ -98,7 +134,9 @@
 
             <button id="tentar-novamente"
                     type="button">
+
                 Tentar novamente
+
             </button>
 
             <a class="regresso" href="index.html">
@@ -110,7 +148,7 @@
     </div>
 
 
-    <!-- INTERFACE DA EXPERIÊNCIA -->
+    <!-- INTERFACE AR -->
 
     <div id="interface-ar">
 
@@ -123,41 +161,10 @@
             <h1>Experiência AR</h1>
 
             <p id="estado">
-                A carregar a experiência...
+                Aponta a câmara para o envelope completo.
             </p>
 
         </div>
-
-        <div class="moldura-ar"></div>
-
-
-        <!-- CONFIGURAÇÕES DA CÂMARA -->
-
-        <details id="camera-opcoes">
-
-            <summary>Câmara</summary>
-
-            <label for="camera-lista">
-                Selecionar câmara
-            </label>
-
-            <select id="camera-lista"></select>
-
-            <button id="camera-trocar"
-                    type="button">
-                Usar esta câmara
-            </button>
-
-            <button id="camera-foco"
-                    type="button">
-                Ativar foco contínuo
-            </button>
-
-            <p id="camera-info"
-               aria-live="polite">
-            </p>
-
-        </details>
 
     </div>
 
@@ -165,6 +172,7 @@
     <!-- CENA MINDAR -->
 
     <a-scene
+
         mindar-image="
             imageTargetSrc: ./target%202.mind;
             autoStart: false;
@@ -177,35 +185,59 @@
             uiScanning: no;
             uiError: no;
         "
+
         color-space="sRGB"
-        renderer="colorManagement: true; alpha: true;"
+
+        renderer="
+            colorManagement: true;
+            alpha: true;
+            antialias: false;
+        "
+
         vr-mode-ui="enabled: false"
+
         device-orientation-permission-ui="enabled: false"
+
         embedded
     >
 
         <a-camera
+
             position="0 0 0"
+
             look-controls="enabled: false">
+
         </a-camera>
 
+
         <a-entity
+
             id="marcador"
+
             mindar-image-target="targetIndex: 0">
 
+
             <a-plane
+
                 id="animacao-envelope"
+
                 width="1.294118"
+
                 height="1.470588"
+
                 position="0 0.392353 0.001"
+
                 rotation="0 0 0"
+
                 material="
                     shader: flat;
                     transparent: true;
                     side: double;
                     depthWrite: false;
                 "
+
                 visible="false"
+
                 sequencia-envelope>
 
             </a-plane>
@@ -215,14 +247,15 @@
     </a-scene>
 
 
-    <!-- PROTEÇÃO CONTRA ERROS -->
+    <!-- PROTEÇÃO CONTRA FALHAS -->
 
     <script>
 
-        window.arFalhou = false;
         window.arPronto = false;
+        window.arFalhou = false;
 
-        window.mostrarErroAR = function(mensagem) {
+
+        window.mostrarErroAR = function (mensagem) {
 
             if (window.arFalhou) return;
 
@@ -231,24 +264,30 @@
             clearTimeout(window.limiteAR);
 
             document.getElementById(
-                "mensagem-erro"
-            ).textContent = mensagem;
+                "inicio-ar"
+            ).hidden = true;
 
             document.getElementById(
                 "carregamento-ar"
-            ).classList.add("oculto");
+            ).hidden = true;
 
             document.getElementById(
                 "erro-ar"
             ).hidden = false;
 
+            document.getElementById(
+                "mensagem-erro"
+            ).textContent = mensagem;
+
+
             try {
 
-                document.querySelector(
-                    "a-scene"
-                ).systems["mindar-image-system"].stop();
+                document.querySelector("a-scene")
+                    .systems["mindar-image-system"]
+                    .stop();
 
             } catch (e) {}
+
 
             document.querySelectorAll("video")
                 .forEach(video => {
@@ -263,29 +302,12 @@
 
         document.getElementById(
             "tentar-novamente"
-        ).addEventListener("click", () => {
-
-            location.reload();
-
-        });
+        ).onclick = () => location.reload();
 
 
-        window.limiteAR = setTimeout(() => {
+        window.addEventListener("error", event => {
 
-            if (!window.arPronto) {
-
-                window.mostrarErroAR(
-                    "O carregamento demorou demasiado tempo."
-                );
-
-            }
-
-        }, 60000);
-
-
-        window.addEventListener("error", e => {
-
-            if (e.target?.tagName === "SCRIPT") {
+            if (event.target?.tagName === "SCRIPT") {
 
                 window.mostrarErroAR(
                     "Não foi possível carregar os recursos da experiência."
@@ -294,6 +316,25 @@
             }
 
         }, true);
+
+
+        window.limiteAR = setTimeout(() => {
+
+            if (
+                !window.arPronto &&
+                !window.arFalhou &&
+                document.getElementById(
+                    "iniciar-experiencia"
+                ).disabled
+            ) {
+
+                window.mostrarErroAR(
+                    "Os recursos da experiência demoraram demasiado tempo a carregar."
+                );
+
+            }
+
+        }, 90000);
 
     </script>
 
