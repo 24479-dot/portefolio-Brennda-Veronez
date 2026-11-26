@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="pt">
 
@@ -12,11 +11,13 @@
 
     <title>Experiência AR | Brennda Veronez</title>
 
+
     <!-- FICHEIROS CSS -->
 
-    <link rel="stylesheet" href="./ar.css?v=18">
+    <link rel="stylesheet" href="./ar.css?v=20">
 
-    <link rel="stylesheet" href="./camera.css?v=18">
+    <link rel="stylesheet" href="./camara.css?v=20">
+
 
     <!-- BIBLIOTECAS MINDAR -->
 
@@ -24,17 +25,21 @@
 
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
+
     <!-- JAVASCRIPT -->
 
-    <script defer src="ar.js?v=16"></script>
+    <script defer src="./ar.js?v=20"></script>
 
-    <script defer src="camera.js?v=17"></script>
+    <script defer src="./camara.js?v=20"></script>
 
 </head>
 
 <body>
 
-    <!-- ECRÃ INICIAL -->
+
+    <!-- ======================================
+         ECRÃ INICIAL
+    ======================================= -->
 
     <div id="inicio-ar" class="ecra">
 
@@ -65,7 +70,9 @@
     </div>
 
 
-    <!-- ECRÃ DE CARREGAMENTO -->
+    <!-- ======================================
+         ECRÃ DE CARREGAMENTO
+    ======================================= -->
 
     <div id="carregamento-ar"
          class="ecra"
@@ -116,7 +123,9 @@
     </div>
 
 
-    <!-- ECRÃ DE ERRO -->
+    <!-- ======================================
+         ECRÃ DE ERRO
+    ======================================= -->
 
     <div id="erro-ar"
          class="ecra"
@@ -155,7 +164,9 @@
     </div>
 
 
-    <!-- INTERFACE AR -->
+    <!-- ======================================
+         INTERFACE AR
+    ======================================= -->
 
     <div id="interface-ar">
 
@@ -168,7 +179,7 @@
             <h1>Experiência AR</h1>
 
             <p id="estado">
-                Aponta a câmara para o envelope completo.
+                Aponta a câmara para o selo dourado.
             </p>
 
         </div>
@@ -185,7 +196,9 @@
         </button>
 
 
-        <!-- PAINEL DE DIAGNÓSTICO -->
+        <!-- ======================================
+             PAINEL DE DIAGNÓSTICO
+        ======================================= -->
 
         <div id="camera-painel" hidden>
 
@@ -345,12 +358,15 @@
     </div>
 
 
-    <!-- CENA MINDAR -->
+    <!-- ======================================
+         CENA MINDAR
+         TARGET 1 — SELO DOURADO
+    ======================================= -->
 
     <a-scene
 
         mindar-image="
-            imageTargetSrc: ./target%202.mind;
+            imageTargetSrc: ./targets%20(1).mind;
             autoStart: false;
             maxTrack: 1;
             filterMinCF: 0.001;
@@ -378,6 +394,9 @@
         embedded
     >
 
+
+        <!-- CÂMARA -->
+
         <a-camera
 
             position="0 0 0"
@@ -387,6 +406,8 @@
         </a-camera>
 
 
+        <!-- TARGET DO SELO -->
+
         <a-entity
 
             id="marcador"
@@ -394,15 +415,17 @@
             mindar-image-target="targetIndex: 0">
 
 
+            <!-- ANIMAÇÃO AJUSTADA AO SELO MAIOR -->
+
             <a-plane
 
                 id="animacao-envelope"
 
-                width="1.294118"
+                width="4.87"
 
-                height="1.470588"
+                height="5.534091"
 
-                position="0 0.392353 0.001"
+                position="-0.09 2.00 0.001"
 
                 rotation="0 0 0"
 
@@ -424,7 +447,9 @@
     </a-scene>
 
 
-    <!-- CONTROLO DE ERROS -->
+    <!-- ======================================
+         CONTROLO DE ERROS
+    ======================================= -->
 
     <script>
 
@@ -492,7 +517,7 @@
             if (event.target?.tagName === "SCRIPT") {
 
                 if (
-                    event.target.src.includes("camera.js")
+                    event.target.src.includes("camara.js")
                 ) {
 
                     console.warn(
@@ -548,6 +573,78 @@
             );
 
         }
+
+
+        // ATUALIZAR INSTRUÇÕES PARA O SELO
+        // SEM ALTERAR O JAVASCRIPT ORIGINAL
+
+        const estadoAR =
+            document.getElementById("estado");
+
+        const estadoTarget =
+            document.getElementById("diag-target");
+
+        const observador = new MutationObserver(() => {
+
+            const correcoes = {
+
+                "Aponta a câmara para o envelope completo.":
+                    "Aponta a câmara para o selo dourado.",
+
+                "Envelope reconhecido!":
+                    "Selo reconhecido!",
+
+                "Volta a apontar para o envelope.":
+                    "Volta a apontar para o selo dourado.",
+
+                "Envelope reconhecido":
+                    "Selo reconhecido",
+
+                "A procurar envelope":
+                    "A procurar selo"
+
+            };
+
+            for (const elemento of [
+                estadoAR,
+                estadoTarget
+            ]) {
+
+                const texto =
+                    elemento.textContent.trim();
+
+                if (correcoes[texto]) {
+
+                    elemento.textContent =
+                        correcoes[texto];
+
+                }
+
+            }
+
+        });
+
+
+        observador.observe(estadoAR, {
+
+            childList: true,
+
+            characterData: true,
+
+            subtree: true
+
+        });
+
+
+        observador.observe(estadoTarget, {
+
+            childList: true,
+
+            characterData: true,
+
+            subtree: true
+
+        });
 
     </script>
 
